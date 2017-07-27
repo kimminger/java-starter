@@ -1,0 +1,32 @@
+
+
+allprojects {
+    version =  '1.5.6.E1'
+
+    tasks.withType(Javadoc) {
+        // Avoid failing builds because of java-doc errors
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding','UTF-8')
+    }
+}
+
+subprojects {
+    ext {
+        springBootVersion = '1.5.6.RELEASE'
+        springCloudVersion = 'Dalston.SR1'
+    }
+
+    tasks.withType(Javadoc) {
+        // Avoid failing builds because of java-doc errors
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding','UTF-8')
+    }
+}
+
+task upload {
+    dependsOn 'spring-cloud-starter-bootstrap:bintrayUpload'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.5'
+}

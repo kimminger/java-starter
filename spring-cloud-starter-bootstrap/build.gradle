@@ -1,0 +1,107 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'maven-publish'
+
+
+
+
+bootRepackage {
+    // Since this is a library, it cant be executed directly
+    enabled = false // Don't create a runnable fat jar
+}
+
+
+
+compileJava {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+
+    options.encoding = "UTF-8"
+}
+
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://dl.bintray.com/elderbyte/maven" }
+}
+
+dependencies {
+
+    compile("org.springframework.data:spring-data-commons")
+
+    // Spring Cloud Feign
+    compile("org.springframework.cloud:spring-cloud-starter-feign")
+
+    // Test dependencies
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("junit:junit")
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId 'com.elderbyte.spring.cloud'
+            artifactId 'spring-cloud-starter-bootstrap'
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['mavenJava']
+
+    dryRun = false //Whether to run this as dry-run, without deploying
+    publish = true //If version should be auto published after an upload
+
+    pkg {
+        repo = 'maven'
+        name = "${jar.baseName}"
+        userOrg = 'elderbyte'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/ElderByte-/spring-cloud-starter-bootstrap'
+
+        version {
+            name = project.version //Bintray logical version name
+        }
+    }
+}

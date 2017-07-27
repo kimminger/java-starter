@@ -1,0 +1,50 @@
+package com.elderbyte.spring.cloud.bootstrap.feign;
+
+
+import com.elderbyte.spring.cloud.bootstrap.jackson.PageJacksonModule;
+import com.fasterxml.jackson.databind.Module;
+import feign.codec.Decoder;
+import feign.codec.Encoder;
+import feign.codec.ErrorDecoder;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.netflix.feign.support.ResponseEntityDecoder;
+import org.springframework.cloud.netflix.feign.support.SpringDecoder;
+import org.springframework.cloud.netflix.feign.support.SpringEncoder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Default feign integration
+ * This class would actually belong into a feign-spring-advanced library, but for now it is here.
+ * Feign should get out of the box support for most of these things anyway.
+ */
+@Configuration
+@EnableCircuitBreaker
+public class DefaultFeignConfiguration {
+
+    @Autowired
+    private ObjectFactory<HttpMessageConverters> messageConverters;
+
+    @Bean
+    public Module PageJacksonModule(){
+        return new PageJacksonModule();
+    }
+
+    @Bean
+    public Encoder feignEncoder() {
+        return new PageableQueryEncoder(new SpringEncoder(messageConverters));
+    }
+
+    @Bean
+    public Decoder feignDecoder() {
+        return new OptionalFrom404Decoder(new ResponseEntityDecoder(new SpringDecoder(messageConverters)));
+    }
+
+    @Bean
+    public ErrorDecoder feignErrorDecoder(){
+        return new SpringWebClientErrorDecoder();
+    }
+}
