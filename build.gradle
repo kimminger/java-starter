@@ -1,7 +1,7 @@
 
 
 allprojects {
-    version =  '1.5.6.E4'
+    version =  '1.5.6.E5'
 
     tasks.withType(Javadoc) {
         // Avoid failing builds because of java-doc errors
