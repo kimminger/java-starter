@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.exceptions;
+package com.elderbyte.commons.exceptions;
 
 /**
  * Is thrown when an entity is not found.

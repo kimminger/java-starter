@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.exceptions;
+package com.elderbyte.commons.exceptions;
 
 /**
  * Utility methods for exception handling.

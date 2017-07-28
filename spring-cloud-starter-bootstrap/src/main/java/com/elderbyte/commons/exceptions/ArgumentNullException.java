@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.exceptions;
+package com.elderbyte.commons.exceptions;
 
 /**
  * Thrown when a method argument which is required (@NonNull) was Null!
