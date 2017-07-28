@@ -48,6 +48,8 @@ repositories {
 
 dependencies {
 
+    compile("org.springframework.boot:spring-boot-starter-web")
+
     compile("org.springframework.data:spring-data-commons")
 
     // Spring Cloud Feign
