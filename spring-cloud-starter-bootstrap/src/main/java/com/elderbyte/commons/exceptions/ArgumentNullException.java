@@ -5,11 +5,9 @@ package com.elderbyte.commons.exceptions;
  */
 public class ArgumentNullException extends IllegalArgumentException {
 
-
     public ArgumentNullException(String argumentName) {
         super("The argument '" + argumentName + "' was NULL!");
     }
-
 
     public ArgumentNullException(String argumentName, Throwable cause) {
         super("The argument '" + argumentName + "' was NULL!", cause);

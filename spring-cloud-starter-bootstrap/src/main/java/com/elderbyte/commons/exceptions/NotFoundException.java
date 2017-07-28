@@ -1,7 +1,7 @@
 package com.elderbyte.commons.exceptions;
 
 /**
- * Is thrown when an entity is not found.
+ * Thrown when an entity is not found.
  */
 public class NotFoundException extends RuntimeException {
 
