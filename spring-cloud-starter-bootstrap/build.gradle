@@ -48,12 +48,18 @@ repositories {
 
 dependencies {
 
-    compile("org.springframework.boot:spring-boot-starter-web")
-
+    // Spring
     compile("org.springframework.data:spring-data-commons")
+
+    // Spring Boot
+    compile("org.springframework.boot:spring-boot-starter-web")
 
     // Spring Cloud Feign
     compile("org.springframework.cloud:spring-cloud-starter-feign")
+
+    // Jackson data types
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // Test dependencies
     testCompile("org.springframework.boot:spring-boot-starter-test")
