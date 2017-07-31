@@ -10,11 +10,13 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.netflix.feign.FeignFormatterRegistrar;
 import org.springframework.cloud.netflix.feign.support.ResponseEntityDecoder;
 import org.springframework.cloud.netflix.feign.support.SpringDecoder;
 import org.springframework.cloud.netflix.feign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 
 /**
  * Default feign integration
@@ -46,5 +48,19 @@ public class DefaultFeignConfiguration {
     @Bean
     public ErrorDecoder feignErrorDecoder(){
         return new SpringWebClientErrorDecoder();
+    }
+
+    /**
+     * Bugfix for Feign not knowing how to handle @DateTimeFormat in query parameters
+     *
+     * see https://github.com/spring-cloud/spring-cloud-netflix/issues/1178
+     */
+    @Bean
+    public FeignFormatterRegistrar localDateFeignFormatterRegistrar() {
+        return formatterRegistry -> {
+            DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
+            registrar.setUseIsoFormat(true);
+            registrar.registerFormatters(formatterRegistry);
+        };
     }
 }
