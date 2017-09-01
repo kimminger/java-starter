@@ -1,5 +1,6 @@
 package com.elderbyte.spring.cloud.bootstrap.feign;
 
+import com.elderbyte.commons.exceptions.ExceptionUtil;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.slf4j.Logger;
@@ -31,25 +32,38 @@ public class SpringWebClientErrorDecoder implements ErrorDecoder {
                 .forEach(entry -> responseHeaders.put(entry.getKey(), new ArrayList<>(entry.getValue())));
 
         HttpStatus statusCode = HttpStatus.valueOf(response.status());
-        String statusText = response.reason();
 
         byte[] responseBody = readResponseBody(response);
-
-        if(statusText == null){
-            // The response 'reason' is often not populated, and Http2 will drop it
-            // Thus we assume additional information might be in the body as text
-            statusText = new String(responseBody);
-        }
+        String errorInfo = getErrorText(response, responseBody);
 
         if (response.status() >= 400 && response.status() <= 499) {
-            return new HttpClientErrorException(statusCode, statusText, responseHeaders, responseBody, null);
+            return new HttpClientErrorException(statusCode, errorInfo, responseHeaders, responseBody, null);
         }
 
         if (response.status() >= 500 && response.status() <= 599) {
-            return new HttpServerErrorException(statusCode, statusText, responseHeaders, responseBody, null);
+            return new HttpServerErrorException(statusCode, errorInfo, responseHeaders, responseBody, null);
         }
         return delegate.decode(methodKey, response);
     }
+
+
+    private String getErrorText(Response response, byte[] responseBody){
+
+        String errorInfo;
+        if(responseBody != null && responseBody.length > 0){
+            // The response 'reason' is often not populated, and Http2 will drop it
+            // Thus we assume additional information might be in the body as text
+            errorInfo = new String(responseBody);
+        }else if(response.reason() != null && response.reason().length() > 0){
+            // If there was no response body we might have luck with the response reason property
+            errorInfo = response.reason();
+        }else{
+            errorInfo = "No detailed error info was found in the response!";
+        }
+        return errorInfo;
+    }
+
+
 
     private byte[] readResponseBody(Response response){
         Response.Body body = response.body();
@@ -57,8 +71,8 @@ public class SpringWebClientErrorDecoder implements ErrorDecoder {
         if(body != null){
             try {
                 responseBody = getBytesFromInputStream(body.asInputStream());
-            } catch (IOException e) {
-                logger.error("Failed to read response body of error message!", e);
+            } catch (Exception e) {
+                logger.warn("Failed to read response body of error message! -> " + ExceptionUtil.aggregateMessages(e));
                 responseBody = new byte[0];
             }
         }else{
