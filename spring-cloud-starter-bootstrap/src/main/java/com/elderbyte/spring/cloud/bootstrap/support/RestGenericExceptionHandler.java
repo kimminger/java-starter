@@ -4,6 +4,8 @@ import com.elderbyte.commons.exceptions.ExceptionUtil;
 import com.elderbyte.commons.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +19,7 @@ import java.io.IOException;
  * A controller advice which deals with unhandled exceptions and transforms them into
  * HTTP responses.
  */
+@Order(Ordered.LOWEST_PRECEDENCE) // Ensure our generic Exception handler gets lowest PRECEDENCE
 @ControllerAdvice
 public class RestGenericExceptionHandler {
 
