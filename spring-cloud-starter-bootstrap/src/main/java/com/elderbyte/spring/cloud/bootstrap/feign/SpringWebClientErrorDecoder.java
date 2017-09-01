@@ -46,8 +46,19 @@ public class SpringWebClientErrorDecoder implements ErrorDecoder {
         return delegate.decode(methodKey, response);
     }
 
-
+    /**
+     * Attempts to get a detailed error message from the response
+     * @param response The response
+     * @param responseBody The extracted response body
+     * @return Detail error information.
+     */
     private String getErrorText(Response response, byte[] responseBody){
+
+        // INFO: The response 'reason' is often not populated, and Http2 will drop it
+        // So the primary source for information is the response body
+
+        // WARN: Since the default HttpClient used in spring / feign drops the response-body
+        // on errors like 401, we might have no change of retrieving it here.
 
         String errorInfo;
         if(responseBody != null && responseBody.length > 0){
@@ -58,7 +69,7 @@ public class SpringWebClientErrorDecoder implements ErrorDecoder {
             // If there was no response body we might have luck with the response reason property
             errorInfo = response.reason();
         }else{
-            errorInfo = "No detailed error info was found in the response!";
+            errorInfo = "(No detailed error info was found in the response!)";
         }
         return errorInfo;
     }
