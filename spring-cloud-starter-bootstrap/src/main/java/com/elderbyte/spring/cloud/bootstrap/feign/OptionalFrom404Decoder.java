@@ -21,6 +21,8 @@ import java.util.Optional;
 public class OptionalFrom404Decoder implements Decoder {
 
     private final Decoder delegate;
+    private HttpStatusExceptionBuilder exceptionBuilder = new HttpStatusExceptionBuilder();
+
 
     public OptionalFrom404Decoder(Decoder delegate){
         if(delegate == null) throw new IllegalArgumentException("delegate was null!");
@@ -38,31 +40,12 @@ public class OptionalFrom404Decoder implements Decoder {
             }
         }else{
            if(response.status() == 404){
-               throw buildClientHttpError(response);
+               throw exceptionBuilder.buildException(response)
+                       .map(e -> (RuntimeException)e)
+                       .orElse(new IllegalStateException("exceptionBuilder failed -> should never happen! Response-Status: " + response.status()));
            }
         }
         return delegate.decode(response, type);
-    }
-
-    private HttpClientErrorException buildClientHttpError(Response response){
-        String statusText = response.reason();
-
-        HttpHeaders responseHeaders = new HttpHeaders();
-        response.headers().entrySet()
-                .forEach(entry -> responseHeaders.put(entry.getKey(), new ArrayList<>(entry.getValue())));
-
-        byte[] responseBody;
-        try {
-            responseBody = new byte[response.body().length()];
-            new DataInputStream(response.body().asInputStream()).readFully(responseBody);
-            if(statusText == null){
-                statusText = new String(responseBody);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to process response body.", e);
-        }
-
-        return new HttpClientErrorException(HttpStatus.NOT_FOUND, statusText, responseHeaders, responseBody, null);
     }
 
     static boolean isOptional(Type type) {
