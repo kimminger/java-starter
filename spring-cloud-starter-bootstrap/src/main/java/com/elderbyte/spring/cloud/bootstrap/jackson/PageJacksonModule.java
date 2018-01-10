@@ -10,6 +10,7 @@ import org.springframework.data.domain.*;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * This jackson module provides support to deserialize spring {Page<T>}
@@ -135,7 +136,7 @@ public class PageJacksonModule extends Module {
             }
             @JsonIgnore
             @Override
-            public <S> Page<S> map(Converter<? super T, ? extends S> converter) {
+            public <S> Page<S> map(Function<? super T, ? extends S> converter) {
                 return delegate.map(converter);
             }
 

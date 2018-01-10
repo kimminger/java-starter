@@ -1,7 +1,7 @@
 
 
 allprojects {
-    version =  '1.5.7.E2'
+    version =  '2.0.0.E1'
 
     tasks.withType(Javadoc) {
         // Avoid failing builds because of java-doc errors
@@ -12,8 +12,8 @@ allprojects {
 
 subprojects {
     ext {
-        springBootVersion = '1.5.7.RELEASE'
-        springCloudVersion = 'Dalston.SR3'
+        springBootVersion = '2.0.0.M7'
+        springCloudVersion = 'Finchley.M5'
     }
 
     tasks.withType(Javadoc) {
@@ -21,10 +21,6 @@ subprojects {
         options.addStringOption('Xdoclint:none', '-quiet')
         options.addStringOption('encoding','UTF-8')
     }
-}
-
-task upload {
-    dependsOn 'spring-cloud-starter-bootstrap:bintrayUpload'
 }
 
 task wrapper(type: Wrapper) {

@@ -8,7 +8,7 @@ import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.netflix.feign.FeignFormatterRegistrar;
 import org.springframework.cloud.netflix.feign.support.ResponseEntityDecoder;
