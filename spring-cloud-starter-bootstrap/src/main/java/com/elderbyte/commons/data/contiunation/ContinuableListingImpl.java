@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class ContiuableListingImpl<T> implements ContinuableListing<T> {
+public class ContinuableListingImpl<T> implements ContinuableListing<T> {
 
     private List<T> content;
     private String nextContinuationToken;
     private String continuationToken;
     private int maxChunkSize;
 
-    public ContiuableListingImpl(
+    public ContinuableListingImpl(
             @JsonProperty("content") List<T> content,
             @JsonProperty("continuationToken") String currentToken,
             @JsonProperty("maxChunkSize") int maxChunkSize,

@@ -4,6 +4,19 @@ import java.util.List;
 
 public interface ContinuableListing<T> {
 
+    static <T> ContinuableListing<T> finiteChunk(List<T> content, int maxChunkSize, ContinuationToken current){
+        return continuable(content, maxChunkSize, current, ContinuationToken.Empty);
+    }
+
+    static <T> ContinuableListing<T> continuable(List<T> content, int maxChunkSize, ContinuationToken current, ContinuationToken nextChunkToken){
+        return new ContinuableListingImpl<>(
+                content,
+                current.getTokenIfNotEmpty().orElse(null),
+                maxChunkSize,
+                nextChunkToken.getTokenIfNotEmpty().orElse(null)
+        );
+    }
+
     /**
      * The content in this listing chunk
      */

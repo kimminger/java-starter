@@ -8,7 +8,9 @@ public class SimpleContinuationToken implements ContinuationToken {
 
     private final String token;
 
-    public SimpleContinuationToken(String token){
+    public static final SimpleContinuationToken Empty = new SimpleContinuationToken("");
+
+    SimpleContinuationToken(String token){
         if(token == null) throw new ArgumentNullException("token");
         this.token = token;
     }

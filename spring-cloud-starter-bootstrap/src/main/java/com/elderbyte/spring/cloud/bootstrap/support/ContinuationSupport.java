@@ -1,7 +1,9 @@
 package com.elderbyte.spring.cloud.bootstrap.support;
 
+import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
 import com.elderbyte.commons.exceptions.ArgumentNullException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -10,17 +12,16 @@ public class ContinuationSupport
 {
 
     /**
-     * Converts a special continuation-token into an unsorted pageable
+     * Decodes a continuation-token into an unsorted pageable
      */
     public static Pageable toPageable(ContinuationToken token){
         return toPageable(token, Sort.unsorted());
     }
 
     /**
-     * Converts a special continuation-token into a pageable
+     * Decodes a continuation-token into a pageable
      * @param token The token with the page information
      * @param sort The sort to use
-     * @return
      */
     public static Pageable toPageable(ContinuationToken token, Sort sort){
 
@@ -41,8 +42,31 @@ public class ContinuationSupport
         }
     }
 
+    /**
+     * Encodes the given pageable into a continuation-token.
+     */
     public static ContinuationToken fromPageable(Pageable pageable){
         return ContinuationToken.from(pageable.getPageNumber() + "-" + pageable.getPageSize());
     }
+
+    /**
+     * Converts the given page into a ContinuableListing
+     * @param page The page.
+     */
+    public static <T> ContinuableListing<T> fromPage(Page<T> page){
+        ContinuationToken currentToken = fromPageable(page.getPageable());
+        ContinuationToken nextToken = null;
+        if(page.hasNext()){
+            nextToken = fromPageable(page.getPageable().next());
+        }
+
+        if(nextToken != null){
+            return ContinuableListing.continuable(page.getContent(), page.getSize(), currentToken, nextToken);
+        }else{
+            return ContinuableListing.finiteChunk(page.getContent(), page.getSize(), currentToken);
+        }
+    }
+
+
 
 }
