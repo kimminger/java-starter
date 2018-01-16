@@ -37,7 +37,7 @@ public class DefaultFeignConfiguration {
 
     @Bean
     public Encoder feignEncoder() {
-        return new PageableQueryEncoder(new SpringEncoder(messageConverters));
+        return new ContinuationTokenQueryEncoder(new PageableQueryEncoder(new SpringEncoder(messageConverters)));
     }
 
     @Bean
