@@ -18,9 +18,9 @@ public class ContinuablePageSupport {
         }
 
         if(nextToken != null){
-            return ContinuableListing.continuable(page.getContent(), page.getSize(), currentToken, nextToken);
+            return ContinuableListing.continuable(page.getContent(), page.getSize(), page.getTotalElements(), currentToken, nextToken);
         }else{
-            return ContinuableListing.finiteChunk(page.getContent(), page.getSize(), currentToken);
+            return ContinuableListing.finiteChunk(page.getContent(), page.getSize(), page.getTotalElements(), currentToken);
         }
     }
 }

@@ -6,15 +6,30 @@ import java.util.List;
 
 public class ContinuableListingImpl<T> implements ContinuableListing<T> {
 
+    /***************************************************************************
+     *                                                                         *
+     * Fields                                                                  *
+     *                                                                         *
+     **************************************************************************/
+
     private List<T> content;
     private String nextContinuationToken;
     private String continuationToken;
     private int maxChunkSize;
+    private Long total;
+
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+
 
     public ContinuableListingImpl(
             @JsonProperty("content") List<T> content,
             @JsonProperty("continuationToken") String currentToken,
             @JsonProperty("maxChunkSize") int maxChunkSize,
+            @JsonProperty("total") Long total,
             @JsonProperty("nextContinuationToken") String nextContinuationToken
             ){
 
@@ -24,7 +39,15 @@ public class ContinuableListingImpl<T> implements ContinuableListing<T> {
         this.continuationToken = currentToken;
         this.nextContinuationToken = nextContinuationToken;
         this.maxChunkSize = maxChunkSize;
+        this.total = total;
     }
+
+    /***************************************************************************
+     *                                                                         *
+     * Properties                                                              *
+     *                                                                         *
+     **************************************************************************/
+
 
     @Override
     @JsonProperty
@@ -46,7 +69,7 @@ public class ContinuableListingImpl<T> implements ContinuableListing<T> {
 
     @Override
     @JsonProperty
-    public int getChunkSize() {
+    public int getMaxChunkSize() {
         return maxChunkSize;
     }
 
@@ -54,5 +77,11 @@ public class ContinuableListingImpl<T> implements ContinuableListing<T> {
     @JsonProperty
     public boolean hasMore() {
         return nextContinuationToken != null;
+    }
+
+    @Override
+    @JsonProperty
+    public Long getTotal() {
+        return total;
     }
 }

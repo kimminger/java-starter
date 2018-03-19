@@ -1,7 +1,6 @@
 package com.elderbyte.spring.cloud.bootstrap.support;
 
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
-import com.elderbyte.commons.data.contiunation.ContinuationToken;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -50,7 +49,7 @@ public class PageableContinuationTokenTest {
         ContinuableListing<String> listing = ContinuablePageSupport.fromPage(myPage);
 
 
-        Assert.assertEquals(3, listing.getChunkSize());
+        Assert.assertEquals(3, listing.getMaxChunkSize());
         Assert.assertEquals(3, listing.getContent().size());
         Assert.assertEquals(true, listing.hasMore());
         Assert.assertEquals("{\"pageIndex\":1,\"pageSize\":3}", decodeUtf8(listing.getContinuationToken()));
