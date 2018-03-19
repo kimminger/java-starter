@@ -23,4 +23,6 @@ public interface ContinuationToken {
         String token = getToken();
         return !token.isEmpty() ? Optional.of(token) : Optional.empty();
     }
+
+
 }

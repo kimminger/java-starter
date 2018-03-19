@@ -1,13 +1,15 @@
 package com.elderbyte.commons.data.contiunation;
 
 import com.elderbyte.commons.exceptions.ArgumentNullException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 public class SimpleContinuationToken implements ContinuationToken {
 
     private final String token;
-
     public static final SimpleContinuationToken Empty = new SimpleContinuationToken("");
 
     SimpleContinuationToken(String token){
