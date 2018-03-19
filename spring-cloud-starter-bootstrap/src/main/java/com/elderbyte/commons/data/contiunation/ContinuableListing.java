@@ -1,6 +1,8 @@
 package com.elderbyte.commons.data.contiunation;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public interface ContinuableListing<T> {
 
@@ -65,4 +67,21 @@ public interface ContinuableListing<T> {
      * Is there more data to load with the NextContiunationToken?
      */
     boolean hasMore();
+
+
+    /**
+     * Returns a new {@link ContinuableListing} with the content of the current one mapped by the given {@link Function}.
+     *
+     * @param converter must not be {@literal null}.
+     * @return a new {@link ContinuableListing} with the content of the current one mapped by the given {@link Function}.
+     */
+    default <U> ContinuableListing<U> map(Function<? super T, ? extends U> converter){
+        return new ContinuableListingImpl<>(
+                this.getContent().stream().map(converter).collect(Collectors.toList()),
+                this.getContinuationToken(),
+                this.getMaxChunkSize(),
+                this.getTotal(),
+                this.getNextContinuationToken()
+        );
+    }
 }
