@@ -11,10 +11,10 @@ public class ContinuablePageSupport {
      * @param page The page.
      */
     public static <T> ContinuableListing<T> fromPage(Page<T> page){
-        ContinuationToken currentToken = PageableContinuationToken.fromPageable(page.getPageable());
+        ContinuationToken currentToken = PageableContinuationToken.buildToken(page.getPageable());
         ContinuationToken nextToken = null;
         if(page.hasNext()){
-            nextToken = PageableContinuationToken.fromPageable(page.getPageable().next());
+            nextToken = PageableContinuationToken.buildToken(page.getPageable().next());
         }
 
         if(nextToken != null){

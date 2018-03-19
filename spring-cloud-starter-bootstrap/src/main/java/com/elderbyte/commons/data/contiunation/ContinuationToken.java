@@ -1,7 +1,5 @@
 package com.elderbyte.commons.data.contiunation;
 
-import com.elderbyte.commons.exceptions.ArgumentNullException;
-
 import java.util.Optional;
 
 public interface ContinuationToken {
@@ -9,8 +7,7 @@ public interface ContinuationToken {
     ContinuationToken Empty = SimpleContinuationToken.Empty;
 
     static ContinuationToken from(String token){
-        if(token == null) throw new ArgumentNullException("token");
-
+        if(token == null || token.isEmpty()) return Empty;
         return new SimpleContinuationToken(token);
     }
 
@@ -23,6 +20,4 @@ public interface ContinuationToken {
         String token = getToken();
         return !token.isEmpty() ? Optional.of(token) : Optional.empty();
     }
-
-
 }

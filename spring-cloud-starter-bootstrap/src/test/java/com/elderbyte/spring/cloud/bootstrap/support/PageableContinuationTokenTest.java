@@ -1,6 +1,8 @@
 package com.elderbyte.spring.cloud.bootstrap.support;
 
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
+import com.elderbyte.commons.data.contiunation.ContinuationToken;
+import com.elderbyte.commons.utils.Utf8Base64;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -19,7 +21,8 @@ public class PageableContinuationTokenTest {
 
     @Test
     public void toPageable() {
-        PageableContinuationToken continuationToken = PageableContinuationToken.from(encodeUtf8("{\"pageIndex\":10,\"pageSize\":35}"));
+        ContinuationToken token = ContinuationToken.from(Utf8Base64.encodeUtf8("{\"pageIndex\":10,\"pageSize\":35}"));
+        PageableContinuationToken continuationToken = PageableContinuationToken.from(token);
         Pageable pageable = continuationToken.asPageable().orElse(null);
 
         assertEquals(10, pageable.getPageNumber());
@@ -28,7 +31,8 @@ public class PageableContinuationTokenTest {
 
     @Test
     public void fromPageable() {
-        PageableContinuationToken continuationToken = PageableContinuationToken.fromPageable(PageRequest.of(10, 35));
+        ContinuationToken token = PageableContinuationToken.buildToken(PageRequest.of(10, 35));
+        PageableContinuationToken continuationToken = PageableContinuationToken.from(token);
         Pageable pageable = continuationToken.asPageable().orElseThrow(() -> new IllegalStateException(""));
         assertEquals(10, pageable.getPageNumber());
         assertEquals(35, pageable.getPageSize());
@@ -52,23 +56,9 @@ public class PageableContinuationTokenTest {
         Assert.assertEquals(3, listing.getMaxChunkSize());
         Assert.assertEquals(3, listing.getContent().size());
         Assert.assertEquals(true, listing.hasMore());
-        Assert.assertEquals("{\"pageIndex\":1,\"pageSize\":3}", decodeUtf8(listing.getContinuationToken()));
-        Assert.assertEquals("{\"pageIndex\":2,\"pageSize\":3}", decodeUtf8(listing.getNextContinuationToken()));
+        Assert.assertEquals("{\"pageIndex\":1,\"pageSize\":3}", Utf8Base64.decodeUtf8(listing.getContinuationToken()));
+        Assert.assertEquals("{\"pageIndex\":2,\"pageSize\":3}", Utf8Base64.decodeUtf8(listing.getNextContinuationToken()));
     }
 
-    private String decodeUtf8(String base64){
-        try {
-            return new String(Base64.getDecoder().decode(base64), "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    private String encodeUtf8(String raw){
-        try {
-            return new String(Base64.getEncoder().encode(raw.getBytes("UTF8")));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package com.elderbyte.spring.cloud.bootstrap.support;
 
+import com.elderbyte.commons.data.contiunation.ContinuationToken;
 import com.elderbyte.commons.data.contiunation.JsonContinuationToken;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -7,29 +8,35 @@ import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
 
-public class PageableContinuationToken extends JsonContinuationToken
-{
-    /**
-     * Encodes the given pageable into a continuation-token.
-     */
-    public static PageableContinuationToken from(String raw){
-        return new PageableContinuationToken(raw);
-    }
-
+public class PageableContinuationToken {
 
     /**
      * Encodes the given pageable into a continuation-token.
      */
-    public static PageableContinuationToken fromPageable(Pageable pageable){
-        return new PageableContinuationToken(new PageableDto(pageable));
+    public static PageableContinuationToken from(ContinuationToken token){
+        return new PageableContinuationToken(token);
     }
 
-    private PageableContinuationToken(String token) {
-        super(token);
+    /**
+     * Encodes the given pageable into a continuation-token.
+     */
+    public static ContinuationToken buildToken(Pageable pageable){
+        return new PageableContinuationToken(new PageableDto(pageable)).getToken();
+    }
+
+    private final JsonContinuationToken token;
+
+    private PageableContinuationToken(ContinuationToken token) {
+        this.token = JsonContinuationToken.from(token);
     }
 
     private PageableContinuationToken(PageableDto pageable) {
-        super(pageable);
+        this(JsonContinuationToken.buildToken(pageable));
+    }
+
+
+    public ContinuationToken getToken(){
+        return this.token.getToken();
     }
 
     /**
@@ -44,7 +51,7 @@ public class PageableContinuationToken extends JsonContinuationToken
      * @param sort The sort to use
      */
     public Optional<Pageable> asPageable(Sort sort){
-        return asJson(PageableDto.class)
+        return token.asJson(PageableDto.class)
                 .map(p -> PageRequest.of(p.pageIndex, p.pageSize, sort));
     }
 }
