@@ -35,8 +35,8 @@ bootJar {
 
 
 compileJava {
-    sourceCompatibility = 9
-    targetCompatibility = 9
+    sourceCompatibility = 10
+    targetCompatibility = 10
 
     options.encoding = "UTF-8"
 }
