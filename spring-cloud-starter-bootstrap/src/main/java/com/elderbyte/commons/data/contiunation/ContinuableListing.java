@@ -1,9 +1,12 @@
 package com.elderbyte.commons.data.contiunation;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@JsonDeserialize(as = ContinuableListingImpl.class)
 public interface ContinuableListing<T> {
 
     static <T> ContinuableListing<T> finiteChunk(List<T> content){
