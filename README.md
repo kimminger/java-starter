@@ -1,4 +1,5 @@
  [ ![Download](https://api.bintray.com/packages/elderbyte/maven/spring-cloud-starter-bootstrap/images/download.svg) ](https://bintray.com/elderbyte/maven/spring-cloud-starter-bootstrap/_latestVersion)
+ [![CircleCI](https://circleci.com/gh/ElderByte-/spring-cloud-starter-bootstrap.svg?style=svg)](https://circleci.com/gh/ElderByte-/spring-cloud-starter-bootstrap)
 
 
 # spring-cloud-starter-bootstrap
