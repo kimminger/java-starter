@@ -61,7 +61,8 @@ dependencies {
     compile("org.springframework.data:spring-data-commons")
 
     // Spring Boot
-    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter")
+    compile('javax.servlet:javax.servlet-api')
 
     // Spring Cloud Feign
     compile("org.springframework.cloud:spring-cloud-starter-openfeign")
