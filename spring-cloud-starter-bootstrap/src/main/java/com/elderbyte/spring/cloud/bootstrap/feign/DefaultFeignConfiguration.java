@@ -9,13 +9,13 @@ import feign.codec.ErrorDecoder;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.openfeign.FeignFormatterRegistrar;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 
 /**
@@ -24,7 +24,7 @@ import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
  * Feign should get out of the box support for most of these things anyway.
  */
 @Configuration
-@EnableCircuitBreaker
+@Import(EnableCircuitBreakerOnHystrix.class)
 public class DefaultFeignConfiguration {
 
     @Autowired
