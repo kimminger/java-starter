@@ -2,6 +2,7 @@ package com.elderbyte.spring.cloud.bootstrap.integration;
 
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuableListingImpl;
+import com.elderbyte.commons.data.contiunation.JsonContinuationTokenBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,6 +21,7 @@ public class ContinuableListingJacksonTests {
     @Autowired
     private ObjectMapper mapper;
 
+
     @Test
     public void test() throws IOException {
 
@@ -32,4 +34,6 @@ public class ContinuableListingJacksonTests {
         Assert.assertTrue(listingAgain instanceof ContinuableListingImpl);
         Assert.assertEquals("foo", listing.getContent().get(0));
     }
+
+
 }

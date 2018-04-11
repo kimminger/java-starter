@@ -1,5 +1,6 @@
 package com.elderbyte.commons.data.contiunation;
 
+import com.elderbyte.commons.exceptions.ArgumentNullException;
 import com.elderbyte.commons.utils.Utf8Base64;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,60 +16,69 @@ import java.util.Optional;
  */
 public class JsonContinuationToken {
 
-    private static ObjectMapper mapper = new ObjectMapper();
+    /***************************************************************************
+     *                                                                         *
+     * Static Builders                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+    private static JsonContinuationTokenBuilder builderInstance = new JsonContinuationTokenBuilder(new ObjectMapper());
+
+    static void setBuilder(JsonContinuationTokenBuilder builder){
+        builderInstance = builder;
+    }
+
 
     /**
      * Constructs a continuation-token from the given raw string
      */
     public static JsonContinuationToken from(ContinuationToken token){
-        return new JsonContinuationToken(token);
+        return new JsonContinuationToken(builderInstance, token);
     }
 
     /**
      * Constructs a continuation-token from the given raw string
      */
     public static ContinuationToken buildToken(Object payload){
-        return buildJsonToken(payload);
+        return builderInstance.buildJsonToken(payload);
     }
 
+    /***************************************************************************
+     *                                                                         *
+     * Fields                                                                  *
+     *                                                                         *
+     **************************************************************************/
 
+    private final JsonContinuationTokenBuilder builder;
     private final ContinuationToken token;
 
-    protected JsonContinuationToken(ContinuationToken token) {
+    /***************************************************************************
+     *                                                                         *
+     * Constructors                                                            *
+     *                                                                         *
+     **************************************************************************/
+
+    protected JsonContinuationToken(JsonContinuationTokenBuilder builder, ContinuationToken token) {
+
+        if(builder == null) throw new ArgumentNullException("builder");
+        if(token == null) throw new ArgumentNullException("token");
+
+        this.builder = builder;
         this.token = token;
     }
+
+    /***************************************************************************
+     *                                                                         *
+     * Properties                                                              *
+     *                                                                         *
+     **************************************************************************/
 
     public ContinuationToken getToken(){
         return this.token;
     }
 
-    public Optional<String> decodeBase64(){
-        return token.getTokenIfNotEmpty()
-                .map(token -> Utf8Base64.decodeUtf8(token));
-    }
-
     public <T> Optional<T> asJson(Class<T> clazz){
-        return decodeBase64()
-                .map(token -> {
-                    try {
-                        return mapper.readValue(token, clazz);
-                    } catch (IOException e) {
-                        throw new IllegalStateException("Could not parse token as JSON", e);
-                    }
-                });
+        return builder.asJson(token, clazz);
     }
 
-
-    /**
-     * Builds a continuation token with the given payload
-     */
-    private static ContinuationToken buildJsonToken(Object data){
-        try {
-            String json = mapper.writeValueAsString(data);
-            String base64 = Utf8Base64.encodeUtf8(json);
-            return ContinuationToken.from(base64);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Could encode object as json string!", e);
-        }
-    }
 }
