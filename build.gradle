@@ -1,7 +1,7 @@
 
 
 allprojects {
-    version =  '2.0.1.E9'
+    version =  '2.0.1.E10'
 
     tasks.withType(Javadoc) {
         // Avoid failing builds because of java-doc errors

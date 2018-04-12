@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.toList;
 
 @JsonDeserialize(as = ContinuableListingImpl.class)
 public interface ContinuableListing<T> {
@@ -80,7 +82,21 @@ public interface ContinuableListing<T> {
      */
     default <U> ContinuableListing<U> map(Function<? super T, ? extends U> converter){
         return new ContinuableListingImpl<>(
-                this.getContent().stream().map(converter).collect(Collectors.toList()),
+                this.getContent().stream().map(converter).collect(toList()),
+                this.getContinuationToken(),
+                this.getMaxChunkSize(),
+                this.getTotal(),
+                this.getNextContinuationToken()
+        );
+    }
+
+    /**
+     * Returns a new {@link ContinuableListing} with the content of the current one filtered by the given {@link Predicate}.
+     * @param predicate The filter function
+     */
+    default ContinuableListing<T> filter(Predicate<T> predicate){
+        return new ContinuableListingImpl<>(
+                this.getContent().stream().filter(predicate).collect(toList()),
                 this.getContinuationToken(),
                 this.getMaxChunkSize(),
                 this.getTotal(),
