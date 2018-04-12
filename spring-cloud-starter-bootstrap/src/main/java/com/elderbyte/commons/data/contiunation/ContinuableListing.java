@@ -23,6 +23,10 @@ public interface ContinuableListing<T> {
         return finiteChunk(new ArrayList<>());
     }
 
+    static <T> ContinuableListing<T> empty(ContinuationToken current){
+        return finiteChunk(new ArrayList<>(), 0, current);
+    }
+
     static <T> ContinuableListing<T> finiteChunk(T... content){
         return finiteChunk(Arrays.asList(content));
     }
