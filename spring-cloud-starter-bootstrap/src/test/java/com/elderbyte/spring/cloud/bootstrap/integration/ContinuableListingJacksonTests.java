@@ -25,7 +25,7 @@ public class ContinuableListingJacksonTests {
     @Test
     public void test() throws IOException {
 
-        var listing = ContinuableListing.finiteChunk(Arrays.asList("foo", "bar"));
+        var listing = ContinuableListing.finiteChunk("foo", "bar");
         String json = mapper.writeValueAsString(listing);
 
 

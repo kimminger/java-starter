@@ -2,6 +2,8 @@ package com.elderbyte.commons.data.contiunation;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -10,6 +12,20 @@ import static java.util.stream.Collectors.toList;
 
 @JsonDeserialize(as = ContinuableListingImpl.class)
 public interface ContinuableListing<T> {
+
+    /***************************************************************************
+     *                                                                         *
+     * Static builders                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+    static <T> ContinuableListing<T> empty(){
+        return finiteChunk(new ArrayList<>());
+    }
+
+    static <T> ContinuableListing<T> finiteChunk(T... content){
+        return finiteChunk(Arrays.asList(content));
+    }
 
     static <T> ContinuableListing<T> finiteChunk(List<T> content){
         return continuable(content, content.size(), ContinuationToken.Empty, ContinuationToken.Empty);
@@ -40,6 +56,12 @@ public interface ContinuableListing<T> {
                 nextChunkToken.getTokenIfNotEmpty().orElse(null)
         );
     }
+
+    /***************************************************************************
+     *                                                                         *
+     * Public Interface                                                        *
+     *                                                                         *
+     **************************************************************************/
 
     /**
      * The content in this listing chunk
