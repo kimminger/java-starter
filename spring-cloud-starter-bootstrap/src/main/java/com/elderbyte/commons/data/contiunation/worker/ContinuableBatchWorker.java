@@ -128,13 +128,15 @@ public class ContinuableBatchWorker<T> {
         private int processedBatches;
         private long batchMaxTimeMs = 0;
         private long batchMinTimeMs = Long.MAX_VALUE;
+        private long totalTimeNano = 0;
 
 
         public void reportProcessedBatch(int items, long nanoTime){
+            totalTimeNano += nanoTime;
             processedItems += items;
             processedBatches++;
 
-            var msTime = nanoTime / (1000*1000);
+            var msTime = nanoToMillis(nanoTime);
             batchMaxTimeMs = Math.max(batchMaxTimeMs, msTime);
             batchMinTimeMs = Math.min(batchMinTimeMs, msTime);
         }
@@ -153,6 +155,15 @@ public class ContinuableBatchWorker<T> {
 
         public long getBatchMinTimeMs() {
             return batchMinTimeMs;
+        }
+
+        public long getTotalTimeMs(){
+            return nanoToMillis(totalTimeNano);
+        }
+
+
+        private long nanoToMillis(long nano){
+            return nano / (1000*1000);
         }
     }
 }
