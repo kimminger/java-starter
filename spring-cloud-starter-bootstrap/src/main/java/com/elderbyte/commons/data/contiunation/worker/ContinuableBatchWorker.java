@@ -31,7 +31,7 @@ public class ContinuableBatchWorker<T> {
     public static <G> ContinuableBatchWorker<G> worker(
             Function<String, ContinuableListing<G>> batchLoader,
             Consumer<List<G>> batchProcessor){
-        return new ContinuableBatchWorker<>(batchLoader, batchProcessor);
+        return worker(batchLoader, batchProcessor);
     }
 
     /***************************************************************************
@@ -52,11 +52,12 @@ public class ContinuableBatchWorker<T> {
      **************************************************************************/
 
     public ContinuableBatchWorker(
-        Function<String, ContinuableListing<T>> batchLoader,
-        Consumer<List<T>> batchProcessor
+            Function<String, ContinuableListing<T>> batchLoader,
+            Consumer<List<T>> batchProcessor
     ){
         if(batchLoader == null) throw new ArgumentNullException("batchLoader");
         if(batchProcessor == null) throw new ArgumentNullException("batchProcessor");
+
         this.batchLoader = batchLoader;
         this.batchProcessor = batchProcessor;
     }
@@ -72,24 +73,35 @@ public class ContinuableBatchWorker<T> {
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
     public Metrics processAll() throws BatchWorkerException {
+        return processAll(metrics -> {});
+    }
+
+    /**
+     * Process all items from the continuable source.
+     * @param progressCallback Callback for metrics report while the worker is processing
+     * @throws BatchWorkerException Thrown when there was an issue processing a batch.
+     */
+    public Metrics processAll(Consumer<Metrics> progressCallback) throws BatchWorkerException {
         String nextToken = null;
-        var metrics = new Metrics();
+        var reporter = new MetricsReporter();
+
         do {
 
             long start = System.nanoTime();
-
             var chunk = loadNext(nextToken);
             var items = chunk.getContent();
 
             processAll(items);
 
-            metrics.reportProcessedBatch(items.size(), System.nanoTime()-start);
+            reporter.reportProcessedBatch(items.size(), System.nanoTime()-start);
 
             nextToken = chunk.getNextContinuationToken();
 
+            progressCallback.accept(reporter.getSnapshot());
+
         } while (nextToken != null);
 
-        return metrics;
+        return reporter.getSnapshot();
     }
 
     /***************************************************************************
@@ -123,13 +135,13 @@ public class ContinuableBatchWorker<T> {
      *                                                                         *
      **************************************************************************/
 
-    public static class Metrics {
+    static class MetricsReporter {
+
         private int processedItems;
         private int processedBatches;
         private long batchMaxTimeMs = 0;
         private long batchMinTimeMs = Long.MAX_VALUE;
         private long totalTimeNano = 0;
-
 
         public void reportProcessedBatch(int items, long nanoTime){
             totalTimeNano += nanoTime;
@@ -139,6 +151,37 @@ public class ContinuableBatchWorker<T> {
             var msTime = nanoToMillis(nanoTime);
             batchMaxTimeMs = Math.max(batchMaxTimeMs, msTime);
             batchMinTimeMs = Math.min(batchMinTimeMs, msTime);
+        }
+
+        public Metrics getSnapshot(){
+            return new Metrics(
+                    processedItems,
+                    processedBatches,
+                    batchMaxTimeMs,
+                    batchMinTimeMs,
+                    nanoToMillis(totalTimeNano)
+            );
+        }
+
+        private long nanoToMillis(long nano){
+            return nano / (1000*1000);
+        }
+    }
+
+    public static class Metrics {
+
+        private final int processedItems;
+        private final int processedBatches;
+        private final long batchMaxTimeMs;
+        private final long batchMinTimeMs;
+        private final long totalTimeMs;
+
+        public Metrics(int processedItems, int processedBatches, long batchMaxTimeMs, long batchMinTimeMs, long totalTimeMs) {
+            this.processedItems = processedItems;
+            this.processedBatches = processedBatches;
+            this.batchMaxTimeMs = batchMaxTimeMs;
+            this.batchMinTimeMs = batchMinTimeMs;
+            this.totalTimeMs = totalTimeMs;
         }
 
         public int getProcessedItems() {
@@ -157,13 +200,8 @@ public class ContinuableBatchWorker<T> {
             return batchMinTimeMs;
         }
 
-        public long getTotalTimeMs(){
-            return nanoToMillis(totalTimeNano);
-        }
-
-
-        private long nanoToMillis(long nano){
-            return nano / (1000*1000);
+        public long getTotalTimeMs() {
+            return totalTimeMs;
         }
     }
 }
