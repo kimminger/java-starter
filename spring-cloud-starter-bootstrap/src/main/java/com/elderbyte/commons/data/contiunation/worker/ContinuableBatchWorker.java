@@ -31,7 +31,7 @@ public class ContinuableBatchWorker<T> {
     public static <G> ContinuableBatchWorker<G> worker(
             Function<String, ContinuableListing<G>> batchLoader,
             Consumer<List<G>> batchProcessor){
-        return worker(batchLoader, batchProcessor);
+        return new ContinuableBatchWorker<>(batchLoader, batchProcessor);
     }
 
     /***************************************************************************
