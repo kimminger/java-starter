@@ -50,6 +50,9 @@ public class DefaultFeignConfiguration {
         return new SpringWebClientErrorDecoder();
     }
 
+    @Bean
+    public FeignBuilderService feignBuilderService() { return new FeignBuilderService(); }
+
     /**
      * Bugfix for Feign not knowing how to handle @DateTimeFormat in query parameters
      *
