@@ -172,4 +172,18 @@ public interface ContinuableListing<T> {
         );
     }
 
+    /**
+     * Returns a new {@link ContinuableListing} with the same properties and content but with the new total value.
+     * @param total The new total item count
+     */
+    default ContinuableListing<T> withTotal(Long total){
+        return new ContinuableListingImpl<>(
+                this.getContent(),
+                this.getContinuationToken(),
+                this.getMaxChunkSize(),
+                total,
+                this.getNextContinuationToken()
+        );
+    }
+
 }
