@@ -129,4 +129,47 @@ public interface ContinuableListing<T> {
                 this.getNextContinuationToken()
         );
     }
+
+    /**
+     * Returns a new {@link ContinuableListing} with the same content but the given current token.
+     * @param currentToken The new current token
+     */
+    default ContinuableListing<T> withCurrentToken(ContinuationToken currentToken){
+        return new ContinuableListingImpl<>(
+                this.getContent(),
+                currentToken.getToken(),
+                this.getMaxChunkSize(),
+                this.getTotal(),
+                this.getNextContinuationToken()
+        );
+    }
+
+    /**
+     * Returns a new {@link ContinuableListing} with the same content but the given next token.
+     * @param nextToken The new next token
+     */
+    default ContinuableListing<T> withNextToken(ContinuationToken nextToken){
+        return new ContinuableListingImpl<>(
+                this.getContent(),
+                this.getContinuationToken(),
+                this.getMaxChunkSize(),
+                this.getTotal(),
+                nextToken.getToken()
+        );
+    }
+
+    /**
+     * Returns a new {@link ContinuableListing} with the same properties but the content replaced by the given one.
+     * @param newContent The content replacement
+     */
+    default ContinuableListing<T> withContent(List<T> newContent){
+        return new ContinuableListingImpl<>(
+                newContent,
+                this.getContinuationToken(),
+                this.getMaxChunkSize(),
+                this.getTotal(),
+                this.getNextContinuationToken()
+        );
+    }
+
 }
