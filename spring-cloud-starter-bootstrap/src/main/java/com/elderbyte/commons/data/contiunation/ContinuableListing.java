@@ -162,7 +162,7 @@ public interface ContinuableListing<T> {
      * Returns a new {@link ContinuableListing} with the same properties but the content replaced by the given one.
      * @param newContent The content replacement
      */
-    default ContinuableListing<T> withContent(List<T> newContent){
+    default <V> ContinuableListing<V> withContent(List<V> newContent){
         return new ContinuableListingImpl<>(
                 newContent,
                 this.getContinuationToken(),
