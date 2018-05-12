@@ -107,12 +107,10 @@ public interface ContinuableListing<T> {
      * @return a new {@link ContinuableListing} with the content of the current one mapped by the given {@link Function}.
      */
     default <U> ContinuableListing<U> map(Function<? super T, ? extends U> converter){
-        return new ContinuableListingImpl<>(
-                this.getContent().stream().map(converter).collect(toList()),
-                this.getContinuationToken(),
-                this.getMaxChunkSize(),
-                this.getTotal(),
-                this.getNextContinuationToken()
+        return withContent(
+                this.getContent().stream()
+                        .map(converter)
+                        .collect(toList())
         );
     }
 
@@ -121,12 +119,10 @@ public interface ContinuableListing<T> {
      * @param predicate The filter function
      */
     default ContinuableListing<T> filter(Predicate<T> predicate){
-        return new ContinuableListingImpl<>(
-                this.getContent().stream().filter(predicate).collect(toList()),
-                this.getContinuationToken(),
-                this.getMaxChunkSize(),
-                this.getTotal(),
-                this.getNextContinuationToken()
+        return withContent(
+                this.getContent().stream()
+                        .filter(predicate)
+                        .collect(toList())
         );
     }
 
