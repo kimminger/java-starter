@@ -10,6 +10,14 @@ import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Represents a chunk of data which can be continued by using the provided next-continuation-token.
+ *
+ * This is basically an abstraction over a pagination with the benefit that the server fully controls
+ * the flow but still is stateless.
+ *
+ * @param <T>
+ */
 @JsonDeserialize(as = ContinuableListingImpl.class)
 public interface ContinuableListing<T> {
 
