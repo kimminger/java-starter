@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -93,7 +94,7 @@ public class ContinuableBatchWorker<T> {
 
             processAll(items);
 
-            reporter.reportProcessedBatch(items.size(), System.nanoTime()-start);
+            reporter.reportProcessedBatch(items.size(), System.nanoTime()-start, chunk.getTotal());
 
             nextToken = chunk.getNextContinuationToken();
 
@@ -137,13 +138,16 @@ public class ContinuableBatchWorker<T> {
 
     static class MetricsReporter {
 
+        private Long totalItems = null;
         private int processedItems;
         private int processedBatches;
         private long batchMaxTimeMs = 0;
         private long batchMinTimeMs = Long.MAX_VALUE;
         private long totalTimeNano = 0;
 
-        public void reportProcessedBatch(int items, long nanoTime){
+        public void reportProcessedBatch(int items, long nanoTime, Long total){
+
+            totalItems = total;
             totalTimeNano += nanoTime;
             processedItems += items;
             processedBatches++;
@@ -155,6 +159,7 @@ public class ContinuableBatchWorker<T> {
 
         public Metrics getSnapshot(){
             return new Metrics(
+                    totalItems,
                     processedItems,
                     processedBatches,
                     batchMaxTimeMs,
@@ -170,13 +175,15 @@ public class ContinuableBatchWorker<T> {
 
     public static class Metrics {
 
+        private final Long totalItems;
         private final int processedItems;
         private final int processedBatches;
         private final long batchMaxTimeMs;
         private final long batchMinTimeMs;
         private final long totalTimeMs;
 
-        public Metrics(int processedItems, int processedBatches, long batchMaxTimeMs, long batchMinTimeMs, long totalTimeMs) {
+        private Metrics(Long totalItems, int processedItems, int processedBatches, long batchMaxTimeMs, long batchMinTimeMs, long totalTimeMs) {
+            this.totalItems = totalItems;
             this.processedItems = processedItems;
             this.processedBatches = processedBatches;
             this.batchMaxTimeMs = batchMaxTimeMs;
@@ -202,6 +209,10 @@ public class ContinuableBatchWorker<T> {
 
         public long getTotalTimeMs() {
             return totalTimeMs;
+        }
+
+        public Optional<Long> getTotalItems() {
+            return Optional.ofNullable(totalItems);
         }
     }
 }
