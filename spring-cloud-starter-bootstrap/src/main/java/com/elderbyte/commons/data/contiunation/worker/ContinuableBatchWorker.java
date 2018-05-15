@@ -1,5 +1,6 @@
 package com.elderbyte.commons.data.contiunation.worker;
 
+import com.elderbyte.commons.cancelation.CancellationToken;
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.exceptions.ArgumentNullException;
 import org.slf4j.Logger;
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -83,7 +85,16 @@ public class ContinuableBatchWorker<T> {
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
     public Metrics processAll(Consumer<Metrics> progressCallback) throws BatchWorkerException {
-        return processAllFrom(null, progressCallback);
+        return processAll(progressCallback, CancellationToken.Never);
+    }
+
+    /**
+     * Process all items from the continuable source.
+     * @param progressCallback Callback for metrics report while the worker is processing
+     * @throws BatchWorkerException Thrown when there was an issue processing a batch.
+     */
+    public Metrics processAll(Consumer<Metrics> progressCallback, CancellationToken cancellationToken) throws BatchWorkerException {
+        return processAllFrom(null, progressCallback, cancellationToken);
     }
 
     /**
@@ -92,20 +103,29 @@ public class ContinuableBatchWorker<T> {
      * @throws BatchWorkerException
      */
     public Metrics processAllFrom(String startToken) throws BatchWorkerException {
-        return processAllFrom(startToken, metrics -> {});
+        return processAllFrom(startToken, metrics -> {}, CancellationToken.Never);
     }
 
     /**
-     * Process all items from the continuable source.
+     * Process all items from the continuable source starting at the given token.
+     * @param startToken The initial token to use - useful to manually resume work. If null starts from the beginning.
      * @param progressCallback Callback for metrics report while the worker is processing
      * @param startToken The initial token to use - useful to manually resume work.
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
-    public Metrics processAllFrom(String startToken, Consumer<Metrics> progressCallback) throws BatchWorkerException {
+    public Metrics processAllFrom(String startToken, Consumer<Metrics> progressCallback, CancellationToken cancellationToken) throws BatchWorkerException, CancellationException {
+
+        if(progressCallback == null) throw new ArgumentNullException("progressCallback");
+        if(cancellationToken == null) throw new ArgumentNullException("cancellationToken");
+
+
         String nextToken = startToken;
         var reporter = new MetricsReporter();
 
         do {
+
+            // Check if processing should be aborted
+            cancellationToken.throwIfCancellationRequested();
 
             long start = System.nanoTime();
 
