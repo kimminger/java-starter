@@ -1,0 +1,133 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'maven-publish'
+
+
+version = "${version}-Sp2.0.1"
+
+
+compileJava {
+    sourceCompatibility = 10
+    targetCompatibility = 10
+
+    options.encoding = "UTF-8"
+}
+
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://dl.bintray.com/elderbyte/maven" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+
+    compile project(":starter")
+
+    // Spring
+    compile("org.springframework.data:spring-data-commons")
+
+    // Spring Boot
+    compile("org.springframework.boot:spring-boot-starter")
+    compile('javax.servlet:javax.servlet-api')
+
+    // Spring Cloud Feign
+    compile("org.springframework.cloud:spring-cloud-starter-openfeign")
+
+    // Jackson data types
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    // Test dependencies
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.springframework.cloud:spring-cloud-starter-netflix-hystrix")
+    testCompile("junit:junit")
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    // Since this is a library, it cant be executed directly
+    enabled = false // Don't create a runnable fat jar
+}
+
+
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId 'com.elderbyte.starter'
+            artifactId 'starter-spring-cloud'
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['mavenJava']
+
+    dryRun = false //Whether to run this as dry-run, without deploying
+    publish = true //If version should be auto published after an upload
+
+    pkg {
+        repo = 'maven'
+        name = "${jar.baseName}"
+        userOrg = 'elderbyte'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/ElderByte-/java-starter'
+
+        version {
+            name = project.version //Bintray logical version name
+        }
+    }
+}
+
+task upload {
+    dependsOn bintrayUpload
+}

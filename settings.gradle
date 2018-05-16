@@ -1,4 +1,3 @@
 
-include 'spring-cloud-starter-bootstrap'
-
-
+include 'starter'
+include 'starter-spring-cloud'
