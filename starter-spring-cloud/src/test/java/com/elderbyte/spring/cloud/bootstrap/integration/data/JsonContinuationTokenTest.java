@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.data;
+package com.elderbyte.spring.cloud.bootstrap.integration.data;
 
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
 import com.elderbyte.commons.data.contiunation.JsonContinuationToken;
