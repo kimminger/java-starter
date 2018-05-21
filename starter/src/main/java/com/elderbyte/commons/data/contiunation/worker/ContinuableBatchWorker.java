@@ -106,7 +106,7 @@ public class ContinuableBatchWorker<T> {
      * Process all items from the continuable source starting at the given token.
      * @param startToken The initial token to use - useful to manually resume work. If null starts from the beginning.
      * @param progressCallback Callback for metrics report while the worker is processing
-     * @param startToken The initial token to use - useful to manually resume work.
+     * @param cancellationToken Token to cancel processing - has to be provided.
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
     public Metrics processAllFrom(String startToken, Consumer<Metrics> progressCallback, CancellationToken cancellationToken) throws BatchWorkerException, CancellationException {
