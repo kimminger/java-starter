@@ -131,9 +131,10 @@ public class ContinuableBatchWorker<T> {
 
             processAll(items);
 
-            reporter.reportProcessedBatch(items.size(), System.nanoTime()-start, chunk.getTotal(), nextToken);
-
+            var currentToken = nextToken;
             nextToken = chunk.getNextContinuationToken();
+
+            reporter.reportProcessedBatch(items.size(), System.nanoTime()-start, chunk.getTotal(), currentToken, nextToken);
 
             progressCallback.accept(reporter.getSnapshot());
 
@@ -174,6 +175,7 @@ public class ContinuableBatchWorker<T> {
 
         private Long totalItems = null;
         private String completedToken = null;
+        private String nextToken = null;
 
         private int processedItems;
         private int processedBatches;
@@ -181,10 +183,11 @@ public class ContinuableBatchWorker<T> {
         private long batchMinTimeMs = Long.MAX_VALUE;
         private long totalTimeNano = 0;
 
-        public void reportProcessedBatch(int items, long nanoTime, Long total, String completedToken){
+        public void reportProcessedBatch(int items, long nanoTime, Long total, String completedToken, String nextToken){
 
             this.totalItems = total;
             this.completedToken = completedToken;
+            this.nextToken = nextToken;
 
             this.totalTimeNano += nanoTime;
             this.processedItems += items;
@@ -199,6 +202,7 @@ public class ContinuableBatchWorker<T> {
             return new Metrics(
                     totalItems,
                     completedToken,
+                    nextToken,
                     processedItems,
                     processedBatches,
                     batchMaxTimeMs,
@@ -216,6 +220,7 @@ public class ContinuableBatchWorker<T> {
 
         private final Long totalItems;
         private final String completedToken;
+        private final String nextToken;
         private final int processedItems;
         private final int processedBatches;
         private final long batchMaxTimeMs;
@@ -225,6 +230,7 @@ public class ContinuableBatchWorker<T> {
         private Metrics(
                 Long totalItems,
                 String completedToken,
+                String nextToken,
                 int processedItems,
                 int processedBatches,
                 long batchMaxTimeMs,
@@ -232,6 +238,7 @@ public class ContinuableBatchWorker<T> {
                 long totalTimeMs) {
 
             this.completedToken = completedToken;
+            this.nextToken = nextToken;
             this.totalItems = totalItems;
             this.processedItems = processedItems;
             this.processedBatches = processedBatches;
@@ -270,6 +277,14 @@ public class ContinuableBatchWorker<T> {
          */
         public String getCompletedToken() {
             return completedToken;
+        }
+
+        /**
+         * The next continuation token of the last completed batch.
+         * Might be null for the last batch.
+         */
+        public String getNextToken() {
+            return nextToken;
         }
     }
 }
