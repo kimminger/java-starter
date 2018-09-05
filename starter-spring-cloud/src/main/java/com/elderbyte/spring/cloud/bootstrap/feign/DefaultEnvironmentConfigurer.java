@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * This class is referenced in META-INF/spring.factories, using the fully qualified name of this class as the key
  */
-public class HystrixEnvironmentConfigurer implements EnvironmentPostProcessor {
+public class DefaultEnvironmentConfigurer implements EnvironmentPostProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -29,6 +29,10 @@ public class HystrixEnvironmentConfigurer implements EnvironmentPostProcessor {
         // Since the RedirectCurrentUserRequestInterceptor requires that the security-context is available in the
         // hystrix thread, we need to enable hystrix.shareSecurityContext
         defaultProperties.put("hystrix.shareSecurityContext", "true");
+
+        // Enable okHttp by default. Otherwise it seems that no http client is configured and as consequence
+        // the FeignClient is not available.
+        defaultProperties.put("feign.okhttp.enabled", "true");
 
 
         addOrReplace(environment.getPropertySources(), defaultProperties);

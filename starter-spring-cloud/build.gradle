@@ -22,7 +22,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'maven-publish'
 
 
-version = "${version}-Sp2.0.1"
+version = "${version}-Sp2.0.4"
 
 
 compileJava {
@@ -58,6 +58,7 @@ dependencies {
 
     // Spring Cloud Feign
     compile("org.springframework.cloud:spring-cloud-starter-openfeign")
+    compile("io.github.openfeign:feign-okhttp:${feignOkHttpVersion}")
 
     // Jackson data types
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
