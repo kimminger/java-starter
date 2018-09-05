@@ -32,6 +32,7 @@ public class DefaultEnvironmentConfigurer implements EnvironmentPostProcessor {
 
         // Enable okHttp by default. Otherwise it seems that no http client is configured and as consequence
         // the FeignClient is not available.
+        // Seems to be introduced by issue fix in Finchley.SR1 https://github.com/spring-cloud/spring-cloud-openfeign/issues/46
         defaultProperties.put("feign.okhttp.enabled", "true");
 
 
