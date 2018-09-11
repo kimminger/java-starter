@@ -34,7 +34,9 @@ public class DefaultEnvironmentConfigurer implements EnvironmentPostProcessor {
         // the FeignClient is not available.
         // Seems to be introduced by issue fix in Finchley.SR1 https://github.com/spring-cloud/spring-cloud-openfeign/issues/46
         defaultProperties.put("feign.okhttp.enabled", "true");
-
+        defaultProperties.put("feign.hystrix.enabled", "false");
+        defaultProperties.put("feign.client.config.default.connectTimeout", "5000");
+        defaultProperties.put("feign.client.config.default.readTimeout", "5000");
 
         addOrReplace(environment.getPropertySources(), defaultProperties);
     }
