@@ -9,17 +9,13 @@ buildscript {
     }
 }
 
-
-
-plugins {
-    id "com.jfrog.bintray" version "1.6"
-}
-
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
 
 
 version = "${version}-Sp2.0.4"
@@ -126,8 +122,4 @@ bintray {
             name = project.version //Bintray logical version name
         }
     }
-}
-
-task upload {
-    dependsOn bintrayUpload
 }

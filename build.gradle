@@ -1,7 +1,15 @@
-
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4")
+    }
+}
 
 allprojects {
-    version =  '3.3.1'
+    version =  '3.3.4'
 
     tasks.withType(Javadoc) {
         // Avoid failing builds because of java-doc errors
@@ -15,6 +23,8 @@ subprojects {
         springBootVersion = '2.0.4.RELEASE'
         springCloudVersion = 'Finchley.SR1'
         feignOkHttpVersion = '9.5.0'
+
+        bintrayVersion = '1.8.4'
     }
 
     tasks.withType(Javadoc) {
@@ -25,5 +35,5 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.10'
 }

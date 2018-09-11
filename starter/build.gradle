@@ -1,13 +1,8 @@
-
-plugins {
-    id "com.jfrog.bintray" version "1.6"
-}
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
-
+apply plugin: 'com.jfrog.bintray'
 
 compileJava {
     sourceCompatibility = 10
@@ -79,8 +74,4 @@ bintray {
             name = project.version //Bintray logical version name
         }
     }
-}
-
-task upload {
-    dependsOn bintrayUpload
 }
