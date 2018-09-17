@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.support;
+package com.elderbyte.spring.cloud.bootstrap.support.servlet;
 
 import com.elderbyte.commons.exceptions.ExceptionUtil;
 import com.elderbyte.commons.exceptions.NotFoundException;
@@ -23,7 +23,7 @@ import java.net.SocketTimeoutException;
  */
 @Order(Ordered.LOWEST_PRECEDENCE) // Ensure our generic Exception handler gets lowest PRECEDENCE
 @ControllerAdvice
-public class RestGenericExceptionHandler {
+public class ServletGenericExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
