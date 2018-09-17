@@ -17,11 +17,11 @@ public class ExceptionUtil {
      * @param exception the exception
      * @return string containing all messages of the stack trace
      */
-    public static String aggregateMessages(Exception exception) {
+    public static String aggregateMessages(Throwable exception) {
 
         StringBuilder sb = new StringBuilder();
 
-        Throwable throwable = exception;
+        var throwable = exception;
         while(throwable !=null) {
             sb.append(throwable.getMessage());
             sb.append(System.lineSeparator());
