@@ -4,14 +4,14 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-public interface PredicateBuildStrategy {
+public interface PredicateBuildStrategy<T> {
     /**
      * Builds a predicate restriction
      *
      * @param pathExpression The path to wire the predicate against
-     * @param criteriaBuilder The cirteria-builder factory
+     * @param cb The cirteria-builder factory
      * @param value The value to check against the path
      * @return A predicate representing this restriction
      */
-    Predicate buildPredicate(Root<?> root, String pathExpression, CriteriaBuilder criteriaBuilder, String value);
+    Predicate buildPredicate(Root<T> root,  CriteriaBuilder cb, String pathExpression, String value);
 }

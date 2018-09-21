@@ -14,7 +14,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 /**
- * Provides the ability to build a search specification from a search criteria expression.
+ * Provides the ability to newSpec a search specification from a search criteria expression.
  * @param <T> The entity type.
  */
 public class PredicateExpressionSpecification<T> implements Specification<T>  {
@@ -64,13 +64,15 @@ public class PredicateExpressionSpecification<T> implements Specification<T>  {
      *                                                                         *
      **************************************************************************/
 
-    private Predicate apply(Expression<PredicateProvider<T>> criterion, Root<T> root, CriteriaBuilder cb){
+    private Predicate apply(Expression<PredicateProvider<T>> expression, Root<T> root, CriteriaBuilder cb){
 
-        if(criterion instanceof ValueExpression){
-            var criteria = ((ValueExpression<PredicateProvider<T>>) criterion).getValue();
+        if(expression == null){
+            return null;
+        }else if(expression instanceof ValueExpression){
+            var criteria = ((ValueExpression<PredicateProvider<T>>) expression).getValue();
             return criteria.getPredicate(root, cb);
-        }else if (criterion instanceof LogicExpression){
-            var crit = ((LogicExpression<PredicateProvider<T>>) criterion);
+        }else if (expression instanceof LogicExpression){
+            var crit = ((LogicExpression<PredicateProvider<T>>) expression);
             var left = apply(crit.getLeft(), root, cb);
             var rigth = apply(crit.getRight(), root, cb);
 
@@ -80,7 +82,7 @@ public class PredicateExpressionSpecification<T> implements Specification<T>  {
                 default: throw new NotSupportedException("Unexpected logic operator: " + crit.getOperator());
             }
         }else{
-            throw new NotSupportedException("Unexpected criteria expression: " + criterion);
+            throw new NotSupportedException("Unexpected criteria expression: " + expression);
         }
     }
 

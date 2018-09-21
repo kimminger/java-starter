@@ -11,31 +11,31 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
 
-public class DatePredicateBuildStrategy implements MatchablePredicateBuildStrategy {
+public class DatePredicateBuildStrategy<T> implements MatchablePredicateBuildStrategy<T> {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 
     @Override
-    public boolean canHandle(Root<?> root, String pathExpression, String value) {
+    public boolean canHandle(Root<T> root, String pathExpression, String value) {
         var path = JpaPathExpression.resolve(root, pathExpression);
         return LocalDateTime.class.isAssignableFrom(path.getJavaType());
     }
 
     @Override
-    public Predicate buildPredicate(Root<?> root, String pathExpression, CriteriaBuilder criteriaBuilder, String value) {
+    public Predicate buildPredicate(Root<T> root, CriteriaBuilder cb, String pathExpression, String value) {
 
         var path = JpaPathExpression.resolve(root, pathExpression);
 
         LocalDateTime date;
 
         try {
-            date = LocalDateTime.parse(value);
+            date = LocalDateTime.parse(value); // TODO This wont handle format differences well!
         } catch (Exception e) {
             log.debug("Failed to parse date as LocalDateTime: " + value, e);
             date = LocalDateTime.MAX;
         }
 
-        return criteriaBuilder.equal(path, date);
+        return cb.equal(path, date);
     }
 }

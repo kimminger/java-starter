@@ -13,17 +13,17 @@ import java.util.Arrays;
 
 import static java.util.stream.Collectors.toList;
 
-public class EnumPredicateBuildStrategy implements MatchablePredicateBuildStrategy {
+public class EnumPredicateBuildStrategy<T> implements MatchablePredicateBuildStrategy<T> {
     @Override
-    public boolean canHandle(Root<?> root, String pathExpression, String value) {
+    public boolean canHandle(Root<T> root, String pathExpression, String value) {
         var path = JpaPathExpression.resolve(root, pathExpression);
         return (Enum.class.isAssignableFrom(path.getJavaType()));
     }
 
     @Override
-    public Predicate buildPredicate(Root<?> root, String pathExpression, CriteriaBuilder cb, String value) {
-        var path = JpaPathExpression.resolve(root, pathExpression);
-        return buildEnumPredicate((Path<? extends Enum>)path, cb, value);
+    public Predicate buildPredicate(Root<T> root, CriteriaBuilder cb, String pathExpression, String value) {
+        Path<? extends Enum> path = JpaPathExpression.resolve(root, pathExpression);
+        return buildEnumPredicate(path, cb, value);
     }
 
     private Predicate buildEnumPredicate(Path<? extends Enum> path, CriteriaBuilder criteriaBuilder, String value) {

@@ -9,10 +9,9 @@ public class DynamicPredicateProvider<T> implements PredicateProvider<T> {
     private final String path;
     private final String value;
 
-    private final PredicateBuildStrategy predicateBuildStrategy;
+    private final PredicateBuildStrategy<T> predicateBuildStrategy;
 
-
-    public DynamicPredicateProvider(String path, String value, PredicateBuildStrategy predicateBuildStrategy){
+    public DynamicPredicateProvider(String path, String value, PredicateBuildStrategy<T> predicateBuildStrategy){
         this.path = path;
         this.value = value;
         this.predicateBuildStrategy = predicateBuildStrategy;
@@ -20,6 +19,6 @@ public class DynamicPredicateProvider<T> implements PredicateProvider<T> {
 
     @Override
     public Predicate getPredicate(Root<T> root, CriteriaBuilder cb) {
-        return predicateBuildStrategy.buildPredicate(root, path, cb, value);
+        return predicateBuildStrategy.buildPredicate(root, cb, path, value);
     }
 }

@@ -1,6 +1,5 @@
 package com.elderbyte.spring.data.jpa.specification.expressions;
 
-import com.elderbyte.commons.exceptions.NotSupportedException;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class LogicExpression<T> extends BinrayExpression<T> {
     public static <T> Expression<T> conjunction(List<Expression<T>> conjunction){
 
         if(conjunction.isEmpty()){
-            throw new NotSupportedException("A conjunction must have at least 1 element");
+            return null;
         }else if(conjunction.size() == 1){
             return conjunction.get(0);
         }else if(conjunction.size() == 2){
@@ -39,7 +38,7 @@ public class LogicExpression<T> extends BinrayExpression<T> {
     public static <T> Expression<T> disjunction(List<? extends Expression<T>> disjunction){
 
         if(disjunction.isEmpty()){
-            throw new NotSupportedException("A conjunction must have at least 1 element");
+            return null;
         }else if(disjunction.size() == 1){
             return disjunction.get(0);
         }else if(disjunction.size() == 2){
@@ -60,12 +59,24 @@ public class LogicExpression<T> extends BinrayExpression<T> {
         }
     }
 
-    public static  <T> LogicExpression<T> or(Expression<T> a, Expression<T> b){
-        return new LogicExpression<>(a, LogicOperator.OR, b);
+    public static  <T> Expression<T> or(Expression<T> a, Expression<T> b){
+        if(a == null){
+            return b;
+        }else if(b == null){
+            return a;
+        }else{
+            return new LogicExpression<>(a, LogicOperator.OR, b);
+        }
     }
 
-    public static  <T> LogicExpression<T> and(Expression<T> a, Expression<T> b){
-        return new LogicExpression<>(a, LogicOperator.AND, b);
+    public static  <T> Expression<T> and(Expression<T> a, Expression<T> b){
+        if(a == null){
+            return b;
+        }else if(b == null){
+            return a;
+        }else{
+            return new LogicExpression<>(a, LogicOperator.AND, b);
+        }
     }
 
 

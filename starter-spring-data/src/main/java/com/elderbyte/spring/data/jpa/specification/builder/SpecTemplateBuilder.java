@@ -3,7 +3,8 @@ package com.elderbyte.spring.data.jpa.specification.builder;
 import com.elderbyte.spring.data.jpa.specification.expressions.Expression;
 import com.elderbyte.spring.data.jpa.specification.expressions.LogicExpression;
 import com.elderbyte.spring.data.jpa.specification.expressions.ValueExpression;
-import com.elderbyte.spring.data.jpa.specification.predicates.CustomPredicateProvider;
+import com.elderbyte.spring.data.jpa.specification.predicates.AutoPredicateBuildStrategy;
+import com.elderbyte.spring.data.jpa.specification.predicates.PredicateBuildStrategy;
 import com.elderbyte.spring.data.jpa.specification.sort.CustomOrderProvider;
 import com.elderbyte.spring.data.jpa.specification.sort.OrderSpecTemplate;
 
@@ -28,6 +29,8 @@ public class SpecTemplateBuilder<T> {
      *                                                                         *
      **************************************************************************/
 
+    private PredicateBuildStrategy<T> defaultPredicateBuilder = new AutoPredicateBuildStrategy<>();
+
     private final List<QueryParamCriteria<T>> paramCriterias = new ArrayList<>();
     private final Map<String, CustomOrderProvider<T>> customSorts = new HashMap<>();
 
@@ -36,6 +39,11 @@ public class SpecTemplateBuilder<T> {
      * Public API                                                              *
      *                                                                         *
      **************************************************************************/
+
+    public SpecTemplateBuilder<T> defaultBuilder(PredicateBuildStrategy<T> defaultPredicateBuilder){
+        this.defaultPredicateBuilder = defaultPredicateBuilder;
+        return this;
+    }
 
     public SpecTemplateBuilder<T> paramPathAny(String queryParam, String ...paths){
 
@@ -57,8 +65,8 @@ public class SpecTemplateBuilder<T> {
         return paramRule(queryParam, new QueryParamRulePath<>(path));
     }
 
-    public SpecTemplateBuilder<T> paramCustom(String queryParam, CustomPredicateProvider<T> customPredicateProvider){
-        return paramRule(queryParam, new QueryParamRuleCustomPredicate<>(customPredicateProvider));
+    public SpecTemplateBuilder<T> paramPathCustom(String queryParam, String path, PredicateBuildStrategy<T> customPredicateProvider){
+        return paramRule(queryParam, new QueryParamRuleCustomPredicate<>(path, customPredicateProvider));
     }
 
     public SpecTemplateBuilder<T> paramRule(String queryParam, QueryParamRule<T> rule){
@@ -89,10 +97,12 @@ public class SpecTemplateBuilder<T> {
      */
     public SortedSpecTemplate<T> build(){
         return new SortedSpecTemplate<>(
-                new QueryParamSpecificationTemplate<>(paramCriterias),
-                new OrderSpecTemplate<>(customSorts)
+                new QueryParamSpecificationTemplate<>(paramCriterias, this.defaultPredicateBuilder),
+                new OrderSpecTemplate<>(customSorts),
+                defaultPredicateBuilder
         );
     }
+
 
 
 }

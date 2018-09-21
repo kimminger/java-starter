@@ -1,5 +1,6 @@
 package com.elderbyte.spring.data.jpa.specification.builder;
 
+import com.elderbyte.commons.exceptions.ArgumentNullException;
 import com.elderbyte.commons.exceptions.NotSupportedException;
 import com.elderbyte.spring.data.jpa.specification.expressions.Expression;
 import com.elderbyte.spring.data.jpa.specification.expressions.LogicExpression;
@@ -16,8 +17,8 @@ public class QueryParamSpecificationTemplate<T> {
      *                                                                         *
      **************************************************************************/
 
-    private PredicateBuildStrategy defaultStrategy = new AutoPredicateBuildStrategy();
-    private Map<String, QueryParamCriteria<T>> rules = new HashMap<>();
+    private final PredicateBuildStrategy<T> defaultStrategy;
+    private final Map<String, QueryParamCriteria<T>> rules = new HashMap<>();
 
     /***************************************************************************
      *                                                                         *
@@ -25,7 +26,12 @@ public class QueryParamSpecificationTemplate<T> {
      *                                                                         *
      **************************************************************************/
 
-    public QueryParamSpecificationTemplate(Collection<QueryParamCriteria<T>> rules){
+    public QueryParamSpecificationTemplate(Collection<QueryParamCriteria<T>> rules, PredicateBuildStrategy<T> defaultStrategy){
+
+        if(rules == null) throw new ArgumentNullException("rules");
+        if(defaultStrategy == null) throw new ArgumentNullException("defaultStrategy");
+
+        this.defaultStrategy = defaultStrategy;
         rules.forEach(r -> this.rules.put(r.getQueryParam().getKey(), r));
     }
 
@@ -38,12 +44,11 @@ public class QueryParamSpecificationTemplate<T> {
     /**
      * Resolve a search criteria expression derived from the given rules and provided query params.
      * @param queryParams
+     * @return Returns a predicate-provider expression - or null if no predicates are available
      */
-    public Expression<PredicateProvider<T>> resolve(Map<String, Set<String>> queryParams){
+    public Expression<PredicateProvider<T>> resolve(Map<String, ? extends Collection<String>> queryParams){
 
         // TODO Also support default params
-
-        // TODO Also support user defined static predicate providers
 
         List<Expression<PredicateProvider<T>>> conjunction = new ArrayList<>();
 
@@ -74,7 +79,9 @@ public class QueryParamSpecificationTemplate<T> {
 
     private Expression<PredicateProvider<T>> mapExpression(Expression<QueryParamRule<T>> ruleExpression, String value){
 
-        if(ruleExpression instanceof ValueExpression){
+        if(ruleExpression == null){
+            return null;
+        }else if(ruleExpression instanceof ValueExpression){
             var valueExpr = (ValueExpression<QueryParamRule<T>>)ruleExpression;
             PredicateProvider<T> singleProvider = resolveRule(valueExpr.getValue(), value);
             return new ValueExpression<>(singleProvider);
@@ -83,9 +90,9 @@ public class QueryParamSpecificationTemplate<T> {
             var logicExpr = (LogicExpression<QueryParamRule<T>>)ruleExpression;
 
             var left = mapExpression(logicExpr.getLeft(), value);
-            var rigth = mapExpression(logicExpr.getRight(), value);
+            var right = mapExpression(logicExpr.getRight(), value);
 
-            return new LogicExpression<>(left, logicExpr.getOperator(), rigth);
+            return new LogicExpression<>(left, logicExpr.getOperator(), right);
         }else{
             throw new NotSupportedException("Unexpected / Unsupported expression: " + ruleExpression);
         }
@@ -98,7 +105,7 @@ public class QueryParamSpecificationTemplate<T> {
             return new DynamicPredicateProvider<>(dynamicPathRule.getPath(), value, defaultStrategy);
         }else if(rule instanceof QueryParamRuleCustomPredicate){
             var customPredicateRule = ((QueryParamRuleCustomPredicate<T>) rule);
-            return new PredicateProviderCustomAdapter<>(value, customPredicateRule.getCustomPredicateProvider());
+            return new DynamicPredicateProvider<>(customPredicateRule.getPath(), value, customPredicateRule.getCustomPredicateProvider());
         }else{
             throw new NotSupportedException("The given rule is not supported: " + rule);
         }

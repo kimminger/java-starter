@@ -2,7 +2,7 @@ package com.elderbyte.spring.data.jpa.integration;
 
 import com.elderbyte.spring.data.jpa.integration.food.Food;
 import com.elderbyte.spring.data.jpa.integration.food.FoodRepository;
-import com.elderbyte.spring.data.jpa.specification.builder.QueryParamSpecBuilder;
+import com.elderbyte.spring.data.jpa.specification.JpaPathExpression;
 import com.elderbyte.spring.data.jpa.specification.builder.QueryParamsBuilder;
 import com.elderbyte.spring.data.jpa.specification.builder.SpecTemplateBuilder;
 import org.junit.Assert;
@@ -51,7 +51,8 @@ public class SpecificationTest {
                                         .add("age", "15")
                                         .build();
 
-        var spec = QueryParamSpecBuilder.from(specTemplate)
+
+        var spec = specTemplate.newSpec()
                     .distinct()
                     .build(queryParams);
 
@@ -77,8 +78,8 @@ public class SpecificationTest {
                 .add("multi", "15")
                 .build();
 
-        var spec = QueryParamSpecBuilder.from(specTemplate)
-                .build(queryParams);
+        var spec = specTemplate.newSpec()
+                        .build(queryParams);
 
         // Test
 
@@ -91,7 +92,15 @@ public class SpecificationTest {
     public void specificationTest_Custom(){
 
         var specTemplate = SpecTemplateBuilder.start(Food.class)
-                .paramCustom("a", (root, cb, value) -> cb.or(cb.equal(root.get("age"), 10), cb.equal(root.get("age"), 15)))
+                .paramPathCustom("a", "age", (root, cb, pathStr, value) -> {
+
+                    var path = JpaPathExpression.resolve(root, pathStr);
+
+                    return cb.or(
+                            cb.equal(path, 10),
+                            cb.equal(path, 15)
+                    );
+                })
                 .build();
 
 
@@ -99,8 +108,8 @@ public class SpecificationTest {
                 .add("a", "does-not-matter")
                 .build();
 
-        var spec = QueryParamSpecBuilder.from(specTemplate)
-                .build(queryParams);
+        var spec = specTemplate.newSpec()
+                        .build(queryParams);
 
         // Test
 
@@ -109,4 +118,26 @@ public class SpecificationTest {
         Assert.assertEquals(2, found.size());
     }
 
+
+    @Test
+    public void specificationTest_Static(){
+
+        var specTemplate = SpecTemplateBuilder.start(Food.class)
+                .paramPathAny("multi", "age", "name", "description")
+                .build();
+
+        var queryParams = QueryParamsBuilder.start()
+                .add("multi", "15")
+                .build();
+
+        var spec = specTemplate.newSpec()
+                .and("age", 15 + "")
+                .build(queryParams);
+
+        // Test
+
+        var found = repository.findAll(spec);
+
+        Assert.assertEquals(1, found.size());
+    }
 }

@@ -6,9 +6,7 @@ import org.springframework.data.jpa.repository.query.QueryUtils;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DynamicOrderBySpecification<T> implements Specification<T> {
 

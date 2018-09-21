@@ -9,19 +9,19 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 
-public class BigDecimalPredicateBuildStrategy  implements MatchablePredicateBuildStrategy {
+public class BigDecimalPredicateBuildStrategy<T>  implements MatchablePredicateBuildStrategy<T> {
 
     @Override
-    public boolean canHandle(Root<?> root, String pathExpression, String value) {
+    public boolean canHandle(Root<T> root, String pathExpression, String value) {
         var path = JpaPathExpression.resolve(root, pathExpression);
         return (BigDecimal.class.isAssignableFrom(path.getJavaType()));
     }
 
     @Override
-    public Predicate buildPredicate(Root<?> root, String pathExpression, CriteriaBuilder criteriaBuilder, String value) {
+    public Predicate buildPredicate(Root<T> root, CriteriaBuilder cb, String pathExpression, String value) {
         var path = JpaPathExpression.resolve(root, pathExpression);
         final double doubleValue = Double.parseDouble(value);
-        return criteriaBuilder.equal(path, BigDecimal.valueOf(doubleValue));
+        return cb.equal(path, BigDecimal.valueOf(doubleValue));
     }
 }
 

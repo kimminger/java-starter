@@ -9,10 +9,10 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class StringPredicateBuildStrategy implements MatchablePredicateBuildStrategy {
+public class StringPredicateBuildStrategy<T> implements MatchablePredicateBuildStrategy<T> {
 
     @Override
-    public boolean canHandle(Root<?> root, String pathExpression, String value) {
+    public boolean canHandle(Root<T> root, String pathExpression, String value) {
 
         var paths = new ArrayList<Path<?>>();
 
@@ -26,15 +26,14 @@ public class StringPredicateBuildStrategy implements MatchablePredicateBuildStra
     }
 
     @Override
-    public Predicate buildPredicate(Root<?> root, String pathExpression, CriteriaBuilder cb, String value) {
+    public Predicate buildPredicate(Root<T> root, CriteriaBuilder cb, String pathExpression,  String value) {
 
         Expression<String> expression;
 
         if(JpaPathExpression.isConcat(pathExpression)){
             expression = buildConcat(root, pathExpression, cb);
         }else{
-            var path = JpaPathExpression.resolve(root, pathExpression);
-            expression = path.as(String.class);
+            expression = JpaPathExpression.resolve(root, pathExpression);
         }
 
         return StringPredicateBuilder.matchSubstringSyntax(expression, cb, value);

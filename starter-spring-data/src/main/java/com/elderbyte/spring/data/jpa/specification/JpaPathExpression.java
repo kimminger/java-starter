@@ -28,7 +28,7 @@ public class JpaPathExpression {
     /**
      * Create {@link Path} for a search column identifier by recursively resolving joins.
      */
-    public static <T,X> Path<X> resolve(From<X, T> root, String pathExpression) {
+    public static <T,X, Y> Path<Y> resolve(From<X, T> root, String pathExpression) {
         if (!pathExpression.contains(".")) return root.get(pathExpression);
         final String[] parts = pathExpression.split("\\.", 2);
         return resolve(root.join(parts[0]), parts[1]);
