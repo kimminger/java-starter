@@ -48,7 +48,6 @@ public class PredicateExpressionSpecification<T> implements Specification<T>  {
 
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        query.distinct(true);
         return apply(predicateExpression, root, cb);
     }
 

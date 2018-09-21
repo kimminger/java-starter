@@ -5,6 +5,7 @@ import com.elderbyte.spring.data.jpa.specification.predicates.PredicateProvider;
 import com.elderbyte.spring.data.jpa.specification.SpecificationPaged;
 import com.elderbyte.spring.data.jpa.specification.SpecificationPagedImpl;
 import com.elderbyte.spring.data.jpa.specification.expressions.Expression;
+import com.elderbyte.spring.data.jpa.specification.query.QueryHook;
 import com.elderbyte.spring.data.jpa.specification.sort.DynamicOrderBySpecification;
 import com.elderbyte.spring.data.jpa.specification.sort.OrderSpecTemplate;
 import org.springframework.data.domain.PageRequest;
@@ -12,13 +13,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class QueryParamSpec<T> {
+public class QueryParamSpecBuilder<T> {
 
-    public static <T> QueryParamSpec<T> from(SortedSpecTemplate<T> specTemplate) {
-        return new QueryParamSpec<>(specTemplate.getFilterTemplate(), specTemplate.getOrderTemplate());
+    public static <T> QueryParamSpecBuilder<T> from(SortedSpecTemplate<T> specTemplate) {
+        return new QueryParamSpecBuilder<>(specTemplate.getFilterTemplate(), specTemplate.getOrderTemplate());
     }
 
     /***************************************************************************
@@ -30,13 +33,15 @@ public class QueryParamSpec<T> {
     private final QueryParamSpecificationTemplate<T> template;
     private final OrderSpecTemplate<T> orderSpecTemplate;
 
+    private final List<QueryHook<T>> hooks = new ArrayList<>();
+
     /***************************************************************************
      *                                                                         *
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
 
-    public QueryParamSpec(QueryParamSpecificationTemplate<T> template, OrderSpecTemplate<T> orderSpecTemplate){
+    public QueryParamSpecBuilder(QueryParamSpecificationTemplate<T> template, OrderSpecTemplate<T> orderSpecTemplate){
         this.template = template;
         this.orderSpecTemplate = orderSpecTemplate;
     }
@@ -46,6 +51,16 @@ public class QueryParamSpec<T> {
      * Public API                                                              *
      *                                                                         *
      **************************************************************************/
+
+    public QueryParamSpecBuilder<T> distinct() {
+        configureQuery((root, qry, cb) -> qry.distinct(true));
+        return this;
+    }
+
+    public QueryParamSpecBuilder<T> configureQuery(QueryHook<T> queryHook){
+        hooks.add(queryHook);
+        return this;
+    }
 
     public SpecificationPaged<T> build(Map<String, Set<String>> queryParams, Pageable pageable){
 
@@ -64,7 +79,17 @@ public class QueryParamSpec<T> {
 
     public Specification<T> build(Map<String, Set<String>> queryParams){
         Expression<PredicateProvider<T>> expression = template.resolve(queryParams);
-        return new PredicateExpressionSpecification<>(expression);
+        return finalize(new PredicateExpressionSpecification<>(expression));
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     * Private methods                                                         *
+     *                                                                         *
+     **************************************************************************/
+
+    private Specification<T> finalize(Specification<T> specification){
+        return new SpecificationHook<>(specification, hooks);
     }
 
 }

@@ -2,7 +2,7 @@ package com.elderbyte.spring.data.jpa.integration;
 
 import com.elderbyte.spring.data.jpa.integration.food.Food;
 import com.elderbyte.spring.data.jpa.integration.food.FoodRepository;
-import com.elderbyte.spring.data.jpa.specification.builder.QueryParamSpec;
+import com.elderbyte.spring.data.jpa.specification.builder.QueryParamSpecBuilder;
 import com.elderbyte.spring.data.jpa.specification.builder.QueryParamsBuilder;
 import com.elderbyte.spring.data.jpa.specification.builder.SpecTemplateBuilder;
 import org.junit.Assert;
@@ -51,7 +51,8 @@ public class SpecificationTest {
                                         .add("age", "15")
                                         .build();
 
-        var spec = QueryParamSpec.from(specTemplate)
+        var spec = QueryParamSpecBuilder.from(specTemplate)
+                    .distinct()
                     .build(queryParams);
 
         // Test
@@ -76,7 +77,7 @@ public class SpecificationTest {
                 .add("multi", "15")
                 .build();
 
-        var spec = QueryParamSpec.from(specTemplate)
+        var spec = QueryParamSpecBuilder.from(specTemplate)
                 .build(queryParams);
 
         // Test
@@ -98,7 +99,7 @@ public class SpecificationTest {
                 .add("a", "does-not-matter")
                 .build();
 
-        var spec = QueryParamSpec.from(specTemplate)
+        var spec = QueryParamSpecBuilder.from(specTemplate)
                 .build(queryParams);
 
         // Test
