@@ -131,7 +131,7 @@ public class SpecificationTest {
                 .build();
 
         var spec = specTemplate.newSpec()
-                .and("age", 15 + "")
+                .andEquals("age", 15)
                 .build(queryParams);
 
         // Test

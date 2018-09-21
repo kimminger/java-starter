@@ -1,5 +1,6 @@
 package com.elderbyte.spring.data.jpa.specification.builder;
 
+import com.elderbyte.spring.data.jpa.specification.JpaPathExpression;
 import com.elderbyte.spring.data.jpa.specification.expressions.LogicExpression;
 import com.elderbyte.spring.data.jpa.specification.expressions.ValueExpression;
 import com.elderbyte.spring.data.jpa.specification.predicates.DynamicPredicateProvider;
@@ -56,17 +57,34 @@ public class QueryParamSpecBuilder<T> {
      *                                                                         *
      **************************************************************************/
 
+    /**
+     * Marks this query as distinct
+     */
     public QueryParamSpecBuilder<T> distinct() {
         configureQuery((root, qry, cb) -> qry.distinct(true));
         return this;
     }
 
+    /**
+     * Provides low level access to the JPA query primitives
+     */
     public QueryParamSpecBuilder<T> configureQuery(QueryHook<T> queryHook){
         hooks.add(queryHook);
         return this;
     }
 
-    public QueryParamSpecBuilder<T> and(String path, String value){
+    /**
+     * Adds a global equality predicate.
+     */
+    public QueryParamSpecBuilder<T> andEquals(String path, Object value){
+        and((root, cb) -> cb.equal(JpaPathExpression.resolve(root, path), value));
+        return this;
+    }
+
+    /**
+     * Adds a global equality predicate which uses the dynamic predicate builder.
+     */
+    public QueryParamSpecBuilder<T> andMatches(String path, String value){
 
         var matchPathValuePredicate = new DynamicPredicateProvider<>(path, value, defaultPredicateBuilder);
         and(matchPathValuePredicate);
@@ -76,6 +94,11 @@ public class QueryParamSpecBuilder<T> {
 
     public QueryParamSpecBuilder<T> and(PredicateProvider<T> predicate){
         and(new ValueExpression<>(predicate));
+        return this;
+    }
+
+    public QueryParamSpecBuilder<T> or(PredicateProvider<T> predicate){
+        or(new ValueExpression<>(predicate));
         return this;
     }
 
