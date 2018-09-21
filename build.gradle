@@ -9,7 +9,7 @@ buildscript {
 }
 
 allprojects {
-    version =  '4.0.4'
+    version =  '4.1.0'
 
     tasks.withType(Javadoc) {
         // Avoid failing builds because of java-doc errors
