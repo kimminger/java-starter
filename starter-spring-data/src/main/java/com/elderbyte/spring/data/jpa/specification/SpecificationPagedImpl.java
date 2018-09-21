@@ -51,4 +51,12 @@ public class SpecificationPagedImpl<T> implements SpecificationPaged<T> {
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         return specification.toPredicate(root, query, cb);
     }
+
+    @Override
+    public String toString() {
+        return "SpecificationPaged{" +
+                "pageable=" + pageable +
+                ", specification=" + specification +
+                '}';
+    }
 }

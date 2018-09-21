@@ -27,4 +27,10 @@ public class SpecificationHook<T> implements Specification<T> {
         hooks.forEach(h -> h.handle(root, query, cb));
         return predicate;
     }
+
+
+    @Override
+    public String toString() {
+        return specification.toString();
+    }
 }

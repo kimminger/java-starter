@@ -21,4 +21,14 @@ public class DynamicPredicateProvider<T> implements PredicateProvider<T> {
     public Predicate getPredicate(Root<T> root, CriteriaBuilder cb) {
         return predicateBuildStrategy.buildPredicate(root, cb, path, value);
     }
+
+
+    @Override
+    public String toString() {
+        return "DynamicPredicateProvider{" +
+                "path='" + path + '\'' +
+                ", value='" + value + '\'' +
+                ", predicateBuildStrategy=" + predicateBuildStrategy +
+                '}';
+    }
 }
