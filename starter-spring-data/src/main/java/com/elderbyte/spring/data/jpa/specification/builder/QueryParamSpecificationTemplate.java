@@ -17,7 +17,7 @@ public class QueryParamSpecificationTemplate<T> {
      *                                                                         *
      **************************************************************************/
 
-    private final PredicateBuildStrategy<T> defaultStrategy;
+    private final PredicateProviderPathValue<T> defaultStrategy;
     private final Map<String, QueryParamCriteria<T>> rules = new HashMap<>();
 
     /***************************************************************************
@@ -26,7 +26,7 @@ public class QueryParamSpecificationTemplate<T> {
      *                                                                         *
      **************************************************************************/
 
-    public QueryParamSpecificationTemplate(Collection<QueryParamCriteria<T>> rules, PredicateBuildStrategy<T> defaultStrategy){
+    public QueryParamSpecificationTemplate(Collection<QueryParamCriteria<T>> rules, PredicateProviderPathValue<T> defaultStrategy){
 
         if(rules == null) throw new ArgumentNullException("rules");
         if(defaultStrategy == null) throw new ArgumentNullException("defaultStrategy");
@@ -102,10 +102,10 @@ public class QueryParamSpecificationTemplate<T> {
 
         if(rule instanceof QueryParamRulePath) {
             var dynamicPathRule = ((QueryParamRulePath) rule);
-            return new DynamicPredicateProvider<>(dynamicPathRule.getPath(), value, defaultStrategy);
+            return new PredicateProviderPathValueAdapter<>(dynamicPathRule.getPath(), value, defaultStrategy);
         }else if(rule instanceof QueryParamRuleCustomPredicate){
             var customPredicateRule = ((QueryParamRuleCustomPredicate<T>) rule);
-            return new DynamicPredicateProvider<>(customPredicateRule.getPath(), value, customPredicateRule.getCustomPredicateProvider());
+            return new PredicateProviderValueAdapter<>(value, customPredicateRule.getPredicateProviderValue());
         }else{
             throw new NotSupportedException("The given rule is not supported: " + rule);
         }

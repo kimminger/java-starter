@@ -53,4 +53,13 @@ public class DynamicOrderBySpecification<T> implements Specification<T> {
         var orders = QueryUtils.toOrders(Sort.by(springOrder), root, cb);
         return orders.get(0);
     }
+
+
+    @Override
+    public String toString() {
+        return specification.toString() + " ORDER BY {" +
+                ", sort=" + sort +
+                ", customOrderHandlers=" + customOrderHandlers +
+                '}';
+    }
 }

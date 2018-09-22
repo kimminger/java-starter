@@ -1,12 +1,9 @@
 package com.elderbyte.spring.data.jpa.specification.builder;
 
-import com.elderbyte.spring.data.jpa.specification.JpaPathExpression;
+import com.elderbyte.spring.data.jpa.specification.JpaPath;
 import com.elderbyte.spring.data.jpa.specification.expressions.LogicExpression;
 import com.elderbyte.spring.data.jpa.specification.expressions.ValueExpression;
-import com.elderbyte.spring.data.jpa.specification.predicates.DynamicPredicateProvider;
-import com.elderbyte.spring.data.jpa.specification.predicates.PredicateBuildStrategy;
-import com.elderbyte.spring.data.jpa.specification.predicates.PredicateExpressionSpecification;
-import com.elderbyte.spring.data.jpa.specification.predicates.PredicateProvider;
+import com.elderbyte.spring.data.jpa.specification.predicates.*;
 import com.elderbyte.spring.data.jpa.specification.SpecificationPaged;
 import com.elderbyte.spring.data.jpa.specification.SpecificationPagedImpl;
 import com.elderbyte.spring.data.jpa.specification.expressions.Expression;
@@ -31,7 +28,7 @@ public class QueryParamSpecBuilder<T> {
     private final QueryParamSpecificationTemplate<T> filterTemplate;
     private final OrderSpecTemplate<T> sortTemplate;
     private final List<QueryHook<T>> hooks = new ArrayList<>();
-    private final PredicateBuildStrategy<T> defaultPredicateBuilder;
+    private final PredicateProviderPathValue<T> defaultPredicateBuilder;
 
     private Expression<PredicateProvider<T>> staticPredicateExpression = null;
     private boolean staticPredicateExpressionOr = false;
@@ -45,7 +42,7 @@ public class QueryParamSpecBuilder<T> {
     public QueryParamSpecBuilder(
             QueryParamSpecificationTemplate<T> filterTemplate,
             OrderSpecTemplate<T> orderSpecTemplate,
-            PredicateBuildStrategy<T> defaultPredicateBuilder){
+            PredicateProviderPathValue<T> defaultPredicateBuilder){
         this.filterTemplate = filterTemplate;
         this.sortTemplate = orderSpecTemplate;
         this.defaultPredicateBuilder = defaultPredicateBuilder;
@@ -77,7 +74,23 @@ public class QueryParamSpecBuilder<T> {
      * Adds a global equality predicate.
      */
     public QueryParamSpecBuilder<T> andEquals(String path, Object value){
-        and((root, cb) -> cb.equal(JpaPathExpression.resolve(root, path), value));
+        and((root, cb) -> cb.equal(JpaPath.resolve(root, path), value));
+        return this;
+    }
+
+    /**
+     * The specified attribute must be a member of the given static values
+     */
+    public QueryParamSpecBuilder<T> andIn(String path, Collection<?> values){
+        and((root, cb) -> JpaPath.resolve(root, path).in(values));
+        return this;
+    }
+
+    /**
+     * The specified attribute must be a member of the given static values
+     */
+    public QueryParamSpecBuilder<T> andNotIn(String path, Collection<?> values){
+        and((root, cb) -> cb.not(JpaPath.resolve(root, path).in(values)));
         return this;
     }
 
@@ -86,9 +99,14 @@ public class QueryParamSpecBuilder<T> {
      */
     public QueryParamSpecBuilder<T> andMatches(String path, String value){
 
-        var matchPathValuePredicate = new DynamicPredicateProvider<>(path, value, defaultPredicateBuilder);
+        var matchPathValuePredicate = new PredicateProviderPathValueAdapter<>(path, value, defaultPredicateBuilder);
         and(matchPathValuePredicate);
 
+        return this;
+    }
+
+    public QueryParamSpecBuilder<T> and(String path, PredicateProviderExpression<T> predicate){
+        and((root, cb) -> predicate.buildPredicate(root, cb, JpaPath.resolve(root, path)));
         return this;
     }
 
@@ -148,6 +166,10 @@ public class QueryParamSpecBuilder<T> {
         );
     }
 
+    public Specification<T> build(Pageable pageable){
+        return build(new HashMap<>(), pageable);
+    }
+
     public SpecificationPaged<T> build(Map<String, ? extends Collection<String>> queryParams, Pageable pageable){
 
         Specification<T> sortedSpec = build(queryParams, pageable.getSort());
@@ -158,9 +180,17 @@ public class QueryParamSpecBuilder<T> {
         );
     }
 
+    public Specification<T> build( Sort sort){
+        return build(new HashMap<>(), sort);
+    }
+
     public Specification<T> build(Map<String, ? extends Collection<String>> queryParams, Sort sort){
         Specification<T> spec = build(queryParams);
         return new DynamicOrderBySpecification<>(spec, sortTemplate, sort);
+    }
+
+    public Specification<T> build(){
+        return build(new HashMap<>());
     }
 
     public Specification<T> build(Map<String, ? extends Collection<String>> queryParams){

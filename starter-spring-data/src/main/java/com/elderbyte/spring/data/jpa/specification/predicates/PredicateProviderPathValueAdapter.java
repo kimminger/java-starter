@@ -4,14 +4,14 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-public class DynamicPredicateProvider<T> implements PredicateProvider<T> {
+public class PredicateProviderPathValueAdapter<T> implements PredicateProvider<T> {
 
     private final String path;
     private final String value;
 
-    private final PredicateBuildStrategy<T> predicateBuildStrategy;
+    private final PredicateProviderPathValue<T> predicateBuildStrategy;
 
-    public DynamicPredicateProvider(String path, String value, PredicateBuildStrategy<T> predicateBuildStrategy){
+    public PredicateProviderPathValueAdapter(String path, String value, PredicateProviderPathValue<T> predicateBuildStrategy){
         this.path = path;
         this.value = value;
         this.predicateBuildStrategy = predicateBuildStrategy;
@@ -25,7 +25,7 @@ public class DynamicPredicateProvider<T> implements PredicateProvider<T> {
 
     @Override
     public String toString() {
-        return "DynamicPredicateProvider{" +
+        return "PredicateProviderPathValueAdapter{" +
                 "path='" + path + '\'' +
                 ", value='" + value + '\'' +
                 ", predicateBuildStrategy=" + predicateBuildStrategy +

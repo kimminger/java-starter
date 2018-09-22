@@ -1,10 +1,11 @@
 package com.elderbyte.spring.data.jpa.specification.predicates.support;
 
-import com.elderbyte.spring.data.jpa.specification.JpaPathExpression;
+import com.elderbyte.spring.data.jpa.specification.JpaPath;
 import com.elderbyte.spring.data.jpa.specification.MatchablePredicateBuildStrategy;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -14,12 +15,12 @@ public class StringPredicateBuildStrategy<T> implements MatchablePredicateBuildS
     @Override
     public boolean canHandle(Root<T> root, String pathExpression, String value) {
 
-        var paths = new ArrayList<Path<?>>();
+        var paths = new ArrayList<Expression<?>>();
 
-        if(JpaPathExpression.isConcat(pathExpression)){
+        if(isConcat(pathExpression)){
             paths.addAll(parseConcat(root, pathExpression));
         }else{
-            paths.add(JpaPathExpression.resolve(root, pathExpression));
+            paths.add(JpaPath.resolve(root, pathExpression));
         }
 
         return paths.stream().allMatch(p -> String.class.isAssignableFrom(p.getJavaType()));
@@ -30,10 +31,10 @@ public class StringPredicateBuildStrategy<T> implements MatchablePredicateBuildS
 
         Expression<String> expression;
 
-        if(JpaPathExpression.isConcat(pathExpression)){
+        if(isConcat(pathExpression)){
             expression = buildConcat(root, pathExpression, cb);
         }else{
-            expression = JpaPathExpression.resolve(root, pathExpression);
+            expression = JpaPath.resolve(root, pathExpression);
         }
 
         return StringPredicateBuilder.matchSubstringSyntax(expression, cb, value);
@@ -55,9 +56,20 @@ public class StringPredicateBuildStrategy<T> implements MatchablePredicateBuildS
         }
     }
 
-    private List<Path<?>> parseConcat(Root<?> root, String pathExpression){
-        return JpaPathExpression.parseConcat(pathExpression).stream()
-                        .map(p -> JpaPathExpression.resolve(root, p))
+    private List<Expression<?>> parseConcat(Root<?> root, String pathExpression){
+        return parseConcat(pathExpression).stream()
+                        .map(p -> JpaPath.resolve(root, p))
                         .collect(toList());
     }
+
+
+
+    public static boolean isConcat(String pathExpression){
+        return pathExpression.contains("@");
+    }
+
+    public static List<String> parseConcat(String pathExpression){
+        return Arrays.asList(pathExpression.split("@"));
+    }
+
 }

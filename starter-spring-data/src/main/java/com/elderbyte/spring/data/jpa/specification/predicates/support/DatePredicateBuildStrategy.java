@@ -1,7 +1,7 @@
 package com.elderbyte.spring.data.jpa.specification.predicates.support;
 
 
-import com.elderbyte.spring.data.jpa.specification.JpaPathExpression;
+import com.elderbyte.spring.data.jpa.specification.JpaPath;
 import com.elderbyte.spring.data.jpa.specification.MatchablePredicateBuildStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +18,14 @@ public class DatePredicateBuildStrategy<T> implements MatchablePredicateBuildStr
 
     @Override
     public boolean canHandle(Root<T> root, String pathExpression, String value) {
-        var path = JpaPathExpression.resolve(root, pathExpression);
+        var path = JpaPath.resolve(root, pathExpression);
         return LocalDateTime.class.isAssignableFrom(path.getJavaType());
     }
 
     @Override
     public Predicate buildPredicate(Root<T> root, CriteriaBuilder cb, String pathExpression, String value) {
 
-        var path = JpaPathExpression.resolve(root, pathExpression);
+        var path = JpaPath.resolve(root, pathExpression);
 
         LocalDateTime date;
 

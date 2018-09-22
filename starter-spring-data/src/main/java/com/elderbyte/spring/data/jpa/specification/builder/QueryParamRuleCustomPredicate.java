@@ -1,23 +1,16 @@
 package com.elderbyte.spring.data.jpa.specification.builder;
 
-import com.elderbyte.spring.data.jpa.specification.predicates.PredicateBuildStrategy;
+import com.elderbyte.spring.data.jpa.specification.predicates.PredicateProviderValue;
 
 public class QueryParamRuleCustomPredicate<T> implements QueryParamRule<T> {
 
-    private final String path;
-    private final PredicateBuildStrategy<T> customPredicateProvider;
+    private final PredicateProviderValue<T> customPredicateProvider;
 
-    public QueryParamRuleCustomPredicate(String path, PredicateBuildStrategy<T> customPredicateProvider) {
-        this.path = path;
+    public QueryParamRuleCustomPredicate(PredicateProviderValue<T> customPredicateProvider) {
         this.customPredicateProvider = customPredicateProvider;
     }
 
-
-    public PredicateBuildStrategy<T> getCustomPredicateProvider() {
+    public PredicateProviderValue<T> getPredicateProviderValue() {
         return customPredicateProvider;
-    }
-
-    public String getPath() {
-        return path;
     }
 }

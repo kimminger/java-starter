@@ -15,7 +15,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class AutoPredicateBuildStrategy<T> implements PredicateBuildStrategy<T> {
+public class AutoPredicateProvider<T> implements PredicateProviderPathValue<T> {
 
     /***************************************************************************
      *                                                                         *
@@ -23,7 +23,7 @@ public class AutoPredicateBuildStrategy<T> implements PredicateBuildStrategy<T> 
      *                                                                         *
      **************************************************************************/
 
-    private static final Logger logger = LoggerFactory.getLogger(AutoPredicateBuildStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(AutoPredicateProvider.class);
 
     private final List<MatchablePredicateBuildStrategy<T>> predicateBuildStrategies = new ArrayList<>();
 
@@ -33,7 +33,7 @@ public class AutoPredicateBuildStrategy<T> implements PredicateBuildStrategy<T> 
      *                                                                         *
      **************************************************************************/
 
-    public AutoPredicateBuildStrategy(){
+    public AutoPredicateProvider(){
         this(
                 Arrays.asList(
                         new NullPredicateBuildStrategy<>(),
@@ -48,7 +48,7 @@ public class AutoPredicateBuildStrategy<T> implements PredicateBuildStrategy<T> 
         );
     }
 
-    public AutoPredicateBuildStrategy(Collection<MatchablePredicateBuildStrategy<T>> predicateBuildStrategies){
+    public AutoPredicateProvider(Collection<MatchablePredicateBuildStrategy<T>> predicateBuildStrategies){
         this.predicateBuildStrategies.addAll(predicateBuildStrategies);
     }
 
@@ -66,7 +66,7 @@ public class AutoPredicateBuildStrategy<T> implements PredicateBuildStrategy<T> 
 
     @Override
     public String toString() {
-        return "AutoPredicateBuildStrategy{" +
+        return "AutoPredicateProvider{" +
                 ", predicateBuildStrategies=" + predicateBuildStrategies.stream().map(s -> s.getClass().getSimpleName()).collect(toList()) +
                 '}';
     }
@@ -77,7 +77,7 @@ public class AutoPredicateBuildStrategy<T> implements PredicateBuildStrategy<T> 
      *                                                                         *
      **************************************************************************/
 
-    private PredicateBuildStrategy<T> findMatching(Root<T> root, String pathExpression, String value) {
+    private PredicateProviderPathValue<T> findMatching(Root<T> root, String pathExpression, String value) {
         return predicateBuildStrategies.stream()
                 .filter(s -> s.canHandle(root, pathExpression, value))
                 .findFirst()

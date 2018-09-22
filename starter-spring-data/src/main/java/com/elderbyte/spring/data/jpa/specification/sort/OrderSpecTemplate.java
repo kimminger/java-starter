@@ -14,4 +14,5 @@ public class OrderSpecTemplate<T> {
     public CustomOrderProvider<T> getCustomOrder(String sortKey){
         return this.customOrderHandlers.get(sortKey);
     }
+
 }
