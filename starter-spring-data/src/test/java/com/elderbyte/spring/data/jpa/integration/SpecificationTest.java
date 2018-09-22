@@ -154,4 +154,30 @@ public class SpecificationTest {
 
         Assert.assertEquals(1, found.size());
     }
+
+
+    @Test
+    public void specificationTest_Number_Expression(){
+
+        var specTemplate = SpecTemplateBuilder.start(Food.class)
+                .paramPath("age", "age")
+                .build();
+
+
+        var queryParams = QueryParamsBuilder.start()
+                .add("age", ">=10")
+                .add("age", "<30")
+                .build();
+
+
+        var spec = specTemplate.newSpec()
+                .distinct()
+                .build(queryParams);
+
+        // Test
+
+        var found = repository.findAll(spec);
+
+        Assert.assertEquals(2, found.size());
+    }
 }
