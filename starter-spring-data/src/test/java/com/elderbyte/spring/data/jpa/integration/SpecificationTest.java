@@ -1,7 +1,11 @@
 package com.elderbyte.spring.data.jpa.integration;
 
 import com.elderbyte.spring.data.jpa.integration.food.Food;
+import com.elderbyte.spring.data.jpa.integration.food.FoodMetadata;
+import com.elderbyte.spring.data.jpa.integration.food.FoodMetadataRepository;
 import com.elderbyte.spring.data.jpa.integration.food.FoodRepository;
+import com.elderbyte.spring.data.jpa.integration.labels.Label;
+import com.elderbyte.spring.data.jpa.integration.labels.LabelRepository;
 import com.elderbyte.spring.data.jpa.specification.builder.QueryParamsBuilder;
 import com.elderbyte.spring.data.jpa.specification.builder.SpecTemplateBuilder;
 import org.junit.Assert;
@@ -13,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DataIntegrationTestApp.class)
 public class SpecificationTest {
@@ -21,15 +26,30 @@ public class SpecificationTest {
     @Autowired
     private FoodRepository repository;
 
+    @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
+    private FoodMetadataRepository metadataRepository;
+
     @Before
     @Transactional
     public void prepare(){
 
-        repository.save(new Food("apple", 10, "Hello"));
+
+        var green = labelRepository.save(new Label("green"));
+        var fresh = labelRepository.save(new Label("fresh"));
+        var old = labelRepository.save(new Label("old"));
+
+        var m1 = metadataRepository.save(new FoodMetadata("m1", green, fresh));
+        var m2 = metadataRepository.save(new FoodMetadata("m2", fresh));
+        var m3 = metadataRepository.save(new FoodMetadata("m3", old));
+
+        repository.save(new Food("apple", 10, "Hello", m1));
         repository.save(new Food("lattice", 15, "Hello"));
-        repository.save(new Food("bread", 1, "Hello 15 now"));
+        repository.save(new Food("bread", 1, "Hello 15 now", m2));
         repository.save(new Food("plum", 6, "Hello"));
-        repository.save(new Food("bean", 33, "Abcd"));
+        repository.save(new Food("bean", 33, "Abcd", m3));
 
 
     }
@@ -173,6 +193,72 @@ public class SpecificationTest {
         var spec = specTemplate.newSpec()
                 .distinct()
                 .build(queryParams);
+
+        // Test
+
+        var found = repository.findAll(spec);
+
+        Assert.assertEquals(2, found.size());
+    }
+
+    @Test
+    public void specificationTest_join_matches(){
+
+        var specTemplate = SpecTemplateBuilder.start(Food.class)
+                .build();
+
+        var spec = specTemplate.newSpec()
+                .distinct()
+                .andMatches("metadata.labels.name", "fresh")
+                .build();
+
+        // Test
+
+        var found = repository.findAll(spec);
+
+        Assert.assertEquals(2, found.size());
+    }
+
+    @Test
+    public void specificationTest_is_member_of(){
+
+        var specTemplate = SpecTemplateBuilder.start(Food.class)
+                .build();
+
+        var spec = specTemplate.newSpec()
+                .distinct()
+                .andIsMemberOf(new Label("green"), "metadata.labels")
+
+                /*
+                .and((r, cb) -> {
+
+                    // var labels = r.get("labels");
+                    // var labels = r.join("labels", JoinType.INNER);
+                    var labels = JpaPath.resolve(r, "labels");
+
+                    return cb.isTrue(
+                            CbUtil.isElementMember(cb, new Label("green"), labels)
+                    );
+                })*/
+                .build();
+
+        // Test
+
+        var found = repository.findAll(spec);
+
+        Assert.assertEquals(1, found.size());
+    }
+
+    @Test
+    public void specificationTest_matches_label(){
+
+        var specTemplate = SpecTemplateBuilder.start(Food.class)
+                .build();
+
+        var spec = specTemplate.newSpec()
+                .distinct()
+                .andMatches("metadata.labels.name", "e")
+                .build();
 
         // Test
 

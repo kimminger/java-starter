@@ -9,6 +9,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Bindable;
+import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.PluralAttribute;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -67,23 +68,35 @@ public class JpaPath {
      **************************************************************************/
 
 
-    private static <T> Expression<T> toExpressionRecursively(From<?, ?> from, PropertyPath property) {
+    private static <T> Expression<T> toExpressionRecursively(From<?,?> from, PropertyPath property) {
 
+        Bindable<?> propertyPathModel;
+        Bindable<?> model = from.getModel();
         String segment = property.getSegment();
 
-        var propertyPathModel = from.get(segment).getModel();
+        if (model instanceof ManagedType) {
+            propertyPathModel = (Bindable<?>) ((ManagedType<?>) model).getAttribute(segment);
+        } else {
+            propertyPathModel = from.get(segment).getModel();
+        }
 
-        Bindable<?> model = from.getModel();
-        var joinType = JoinType.LEFT;
+        var joinType = decideJoinType(propertyPathModel, model instanceof PluralAttribute, !property.hasNext());
+        // JoinType joinType = null;
 
-        if (requiresJoin(propertyPathModel, model instanceof PluralAttribute, !property.hasNext())
-                && !isAlreadyFetched(from, segment, joinType)) {
+        if(joinType != null && !isAlreadyFetched(from, segment, joinType)){
             Join<?, ?> join = getOrCreateJoin(from, segment, joinType);
             return (Expression<T>) (property.hasNext() ? toExpressionRecursively(join, property.next()) : join);
         } else {
             Path<Object> path = from.get(segment);
             return (Expression<T>) (property.hasNext() ? toExpressionRecursively(path, property.next()) : path);
         }
+    }
+
+
+    static Expression<Object> toExpressionRecursively(Path<Object> path, PropertyPath property) {
+
+        Path<Object> result = path.get(property.getSegment()); //Illegal attempt to dereference path source [null.propertyname] of basic type
+        return property.hasNext() ? toExpressionRecursively(result, property.next()) : result;
     }
 
     /**
@@ -95,47 +108,43 @@ public class JpaPath {
      * @param isLeafProperty is this the final property navigated by a {@link PropertyPath}?
      * @return wether an outer join is to be used for integrating this attribute in a query.
      */
-    private static boolean requiresJoin(@Nullable Bindable<?> propertyPathModel, boolean isPluralAttribute,
+    private static JoinType decideJoinType(@Nullable Bindable<?> propertyPathModel, boolean isPluralAttribute,
                                         boolean isLeafProperty) {
 
         if (propertyPathModel == null && isPluralAttribute) {
-            return true;
+            return JoinType.LEFT;
         }
 
         if (!(propertyPathModel instanceof Attribute)) {
-            return false;
+            return null; // no join
         }
 
         var attribute = (Attribute<?, ?>) propertyPathModel;
 
         if (!ASSOCIATION_TYPES.containsKey(attribute.getPersistentAttributeType())) {
-            return false;
+            return null; // no join
         }
 
-        if (isLeafProperty && !attribute.isCollection()) {
-            return false;
+        if (isLeafProperty) { // && !attribute.isCollection()
+            return null; // no join
         }
 
         var associationAnnotation = ASSOCIATION_TYPES.get(attribute.getPersistentAttributeType());
 
         if (associationAnnotation == null) {
-            return true;
+            return JoinType.LEFT;
         }
 
         Member member = attribute.getJavaMember();
 
         if (!(member instanceof AnnotatedElement)) {
-            return true;
+            return JoinType.LEFT;
         }
 
         var annotation = AnnotationUtils.getAnnotation((AnnotatedElement) member, associationAnnotation);
-        return annotation == null ? true : (boolean) AnnotationUtils.getValue(annotation, "optional");
-    }
+        var isOptional = annotation == null ? true : (boolean) AnnotationUtils.getValue(annotation, "optional");
 
-    static Expression<Object> toExpressionRecursively(Path<Object> path, PropertyPath property) {
-
-        Path<Object> result = path.get(property.getSegment());
-        return property.hasNext() ? toExpressionRecursively(result, property.next()) : result;
+        return isOptional ? JoinType.LEFT : JoinType.INNER;
     }
 
     /**

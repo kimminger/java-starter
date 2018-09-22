@@ -1,7 +1,8 @@
 package com.elderbyte.spring.data.jpa.integration.food;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import com.elderbyte.spring.data.jpa.integration.labels.Label;
+
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -14,11 +15,19 @@ public class Food {
 
     private String description;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    private FoodMetadata metadata = null;
+
     public Food(){}
+
     public Food(String name, int age, String description){
+        this(name, age, description, null);
+    }
+    public Food(String name, int age, String description, FoodMetadata metadata){
         this.name = name;
         this.age = age;
         this.description = description;
+        this.metadata = metadata;
     }
 
     public String getName() {
@@ -45,6 +54,7 @@ public class Food {
     public int hashCode() {
         return Objects.hash(name);
     }
+
 
 
 }

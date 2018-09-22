@@ -1,5 +1,6 @@
 package com.elderbyte.spring.data.jpa.specification.builder;
 
+import com.elderbyte.spring.data.jpa.specification.CbUtil;
 import com.elderbyte.spring.data.jpa.specification.JpaPath;
 import com.elderbyte.spring.data.jpa.specification.expressions.LogicExpression;
 import com.elderbyte.spring.data.jpa.specification.expressions.ValueExpression;
@@ -83,6 +84,16 @@ public class QueryParamSpecBuilder<T> {
      */
     public QueryParamSpecBuilder<T> andIn(String path, Collection<?> values){
         and((root, cb) -> JpaPath.resolve(root, path).in(values));
+        return this;
+    }
+
+    /**
+     * The specified attribute must be a member of the given static values
+     */
+    public QueryParamSpecBuilder<T> andIsMemberOf(Object value, String path){
+        and((root, cb) -> cb.isTrue(
+                CbUtil.isElementMember(cb, value, JpaPath.resolve(root, path))
+        ));
         return this;
     }
 
