@@ -41,9 +41,7 @@ public class AutoPredicateProvider<T> implements PredicateProviderPathValue<T> {
                         new BooleanPredicateBuildStrategy<>(),
                         new DatePredicateBuildStrategy<>(),
                         new EnumPredicateBuildStrategy<>(),
-                        new IntegerPredicateBuildStrategy<>(),
-                        new DoublePredicateBuildStrategy<>(),
-                        new BigDecimalPredicateBuildStrategy<>()
+                        new NumericPredicateBuildStrategy<>()
                 )
         );
     }
