@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
-public class RawTextCriteria extends TextCriteria {
+public class TextCriteriaRaw extends TextCriteria {
 
     private final String rawSearch;
 
@@ -14,11 +14,11 @@ public class RawTextCriteria extends TextCriteria {
     private @Nullable Boolean diacriticSensitive;
 
 
-    protected RawTextCriteria(String rawSearch) {
+    protected TextCriteriaRaw(String rawSearch) {
         this(rawSearch, null);
     }
 
-    protected RawTextCriteria(String rawSearch, @Nullable String language) {
+    protected TextCriteriaRaw(String rawSearch, @Nullable String language) {
 
         this.rawSearch = rawSearch;
         this.language = language;
@@ -29,8 +29,8 @@ public class RawTextCriteria extends TextCriteria {
      *
      * @return
      */
-    public static RawTextCriteria search(String rawQuery) {
-        return new RawTextCriteria(rawQuery, null);
+    public static TextCriteriaRaw search(String rawQuery) {
+        return new TextCriteriaRaw(rawQuery, null);
     }
 
     /**
@@ -40,8 +40,8 @@ public class RawTextCriteria extends TextCriteria {
      * @param language
      * @return
      */
-    public static RawTextCriteria search(String rawQuery, String language) {
-        return new RawTextCriteria(rawQuery, language);
+    public static TextCriteriaRaw search(String rawQuery, String language) {
+        return new TextCriteriaRaw(rawQuery, language);
     }
 
     /**
@@ -51,7 +51,8 @@ public class RawTextCriteria extends TextCriteria {
      * @return never {@literal null}.
      * @since 1.10
      */
-    public RawTextCriteria caseSensitive(boolean caseSensitive) {
+    @Override
+    public TextCriteriaRaw caseSensitive(boolean caseSensitive) {
 
         this.caseSensitive = caseSensitive;
         return this;
@@ -64,7 +65,8 @@ public class RawTextCriteria extends TextCriteria {
      * @return never {@literal null}.
      * @since 1.10
      */
-    public RawTextCriteria diacriticSensitive(boolean diacriticSensitive) {
+    @Override
+    public TextCriteriaRaw diacriticSensitive(boolean diacriticSensitive) {
 
         this.diacriticSensitive = diacriticSensitive;
         return this;
