@@ -47,23 +47,16 @@ dependencies {
 
     // Spring
     compile("org.springframework.data:spring-data-commons")
-    compile("org.springframework.data:spring-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
-    compile("javax.persistence:javax.persistence-api:2.2")
-
-    // Spring Boot
-    // compile("org.springframework.boot:spring-boot-starter")
+    compile("com.fasterxml.jackson.core:jackson-databind")
 
     // Test dependencies
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
 
-    // Test Database
+    // Test
     testCompile("org.springframework.boot:spring-boot-starter")
-    testCompile("org.hibernate:hibernate-java8")
-    testCompile("com.h2database:h2")
-    testCompile("com.zaxxer:HikariCP")
-    testCompile("javax.xml.bind:jaxb-api:2.3.0") // TODO Fix for hibernate / java 9 xml bind error
 }
 
 jar {
@@ -96,7 +89,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             groupId 'com.elderbyte.starter'
-            artifactId 'starter-spring-data'
+            artifactId 'starter-spring-mongo'
 
             artifact sourcesJar
             artifact javadocJar

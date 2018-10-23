@@ -1,0 +1,10 @@
+
+
+logging:
+  level:
+    root: INFO
+    com.elderbyte: DEBUG
+
+spring.mongodb.embedded:
+  version: 4.0.0
+  features: sync_delay,no_http_interface_arg,only_with_ssl

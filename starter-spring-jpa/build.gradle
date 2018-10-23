@@ -1,0 +1,126 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+
+
+version = "${version}-Sp2.0.4"
+
+
+compileJava {
+    sourceCompatibility = 10
+    targetCompatibility = 10
+
+    options.encoding = "UTF-8"
+}
+
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://dl.bintray.com/elderbyte/maven" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+
+    compile project(":starter")
+
+    // Spring
+    compile("org.springframework.data:spring-data-commons")
+    compile("org.springframework.data:spring-data-jpa")
+
+    compile("javax.persistence:javax.persistence-api:2.2")
+
+    // Spring Boot
+    // compile("org.springframework.boot:spring-boot-starter")
+
+    // Test dependencies
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("junit:junit")
+
+    // Test Database
+    testCompile("org.springframework.boot:spring-boot-starter")
+    testCompile("org.hibernate:hibernate-java8")
+    testCompile("com.h2database:h2")
+    testCompile("com.zaxxer:HikariCP")
+    testCompile("javax.xml.bind:jaxb-api:2.3.0") // TODO Fix for hibernate / java 9 xml bind error
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    // Since this is a library, it cant be executed directly
+    enabled = false // Don't create a runnable fat jar
+}
+
+
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId 'com.elderbyte.starter'
+            artifactId 'starter-spring-jpa'
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['mavenJava']
+
+    dryRun = false //Whether to run this as dry-run, without deploying
+    publish = true //If version should be auto published after an upload
+
+    pkg {
+        repo = 'maven'
+        name = "${jar.baseName}"
+        userOrg = 'elderbyte'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/ElderByte-/java-starter'
+
+        version {
+            name = project.version //Bintray logical version name
+        }
+    }
+}
