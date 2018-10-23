@@ -9,13 +9,20 @@ A java common library to streamline basic java code.
 * `ContinuationListing<T>`, `ContinuationToken` Support
 
 
-## starter-spring-cloud  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-cloud/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-cloud/_latestVersion)
+## starter-spring-jpa  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-jpa/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-jpa/_latestVersion)
 
 Provides an initial spring boot / cloud configuration for usage in microservice environments. The configuration is automatically applied when this library is on the class-path.
 
 * Feign Spring Support for common spring data types
 * Jackson Spring Support for common spring data types
 * Spring MVC generic exception handler for the common exceptions
+
+## starter-spring-mongo  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-mongo/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-mongo/_latestVersion)
+
+Provides utilities and converters for spring mongo db.
+
+* OffsetDateTime and ZonedDateTime converters
+* Native Text Query utilities
 
 ### Version
 
