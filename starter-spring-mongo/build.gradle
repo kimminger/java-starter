@@ -18,7 +18,7 @@ apply plugin: 'com.jfrog.bintray'
 
 
 
-version = "${version}-Sp${springBoot}"
+version = "${version}-Sp${springBootVersionBase}"
 
 
 compileJava {
