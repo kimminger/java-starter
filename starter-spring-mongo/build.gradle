@@ -22,8 +22,8 @@ version = "${version}-Sp${springBootVersionBase}"
 
 
 compileJava {
-    sourceCompatibility = 10
-    targetCompatibility = 10
+    sourceCompatibility = 11
+    targetCompatibility = 11
 
     options.encoding = "UTF-8"
 }

@@ -9,7 +9,7 @@ buildscript {
 }
 
 allprojects {
-    version =  '4.3.0'
+    version =  '5.0.0'
 
     tasks.withType(Javadoc) {
         // Avoid failing builds because of java-doc errors
@@ -36,5 +36,5 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.10'
+    gradleVersion = '4.10.2'
 }
