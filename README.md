@@ -1,4 +1,4 @@
- [![CircleCI](https://circleci.com/gh/ElderByte-/spring-cloud-starter-bootstrap.svg?style=svg)](https://circleci.com/gh/ElderByte-/spring-cloud-starter-bootstrap)
+[![CircleCI](https://circleci.com/gh/ElderByte-/java-starter.svg?style=svg)](https://circleci.com/gh/ElderByte-/java-starter)
 
 
 ## starter  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter/images/download.svg) ](https://bintray.com/elderbyte/maven/starter/_latestVersion)
