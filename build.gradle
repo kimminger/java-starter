@@ -20,9 +20,9 @@ allprojects {
 
 subprojects {
     ext {
-        springBootVersionBase = '2.1.0'
+        springBootVersionBase = '2.1.1'
         springBootVersion = springBootVersionBase + '.RELEASE'
-        springCloudVersion = 'Greenwich.M1'
+        springCloudVersion = 'Greenwich.RC2'
         feignOkHttpVersion = '10.0.1'
 
         bintrayVersion = '1.8.4'
@@ -33,8 +33,4 @@ subprojects {
         options.addStringOption('Xdoclint:none', '-quiet')
         options.addStringOption('encoding','UTF-8')
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.2'
 }
