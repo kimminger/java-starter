@@ -34,7 +34,9 @@ public class AsyncProcess<T> {
      * @return The process
      * @throws IOException
      */
-    public static AsyncProcess<String> start(final String[] command, ExecutorService processIOThreadPool) throws IOException {
+    public static AsyncProcess<String> start(
+            final String[] command,
+            ExecutorService processIOThreadPool) throws IOException {
        return start(command, new TextStreamReader(), processIOThreadPool);
     }
 
@@ -45,13 +47,31 @@ public class AsyncProcess<T> {
      * @return The process
      * @throws IOException
      */
-    public static <T> AsyncProcess<T> start(final String[] command, StreamReader<T> standardOutReader, ExecutorService processIOThreadPool) throws IOException {
+    public static <T> AsyncProcess<T> start(
+            final String[] command,
+            StreamReader<T> standardOutReader,
+            ExecutorService processIOThreadPool) throws IOException {
+        return start(new ProcessBuilder(command), standardOutReader, processIOThreadPool);
+    }
+
+
+    /**
+     * Starts a new process with the given commandline arguments
+     * @param processBuilder the commandline args
+     * @param standardOutReader standard output is copied to this stream
+     * @return The process
+     * @throws IOException
+     */
+    public static <T> AsyncProcess<T> start(
+            ProcessBuilder processBuilder,
+            StreamReader<T> standardOutReader,
+            ExecutorService processIOThreadPool) throws IOException {
         return new AsyncProcess<>(
-            startProcess(command),
-            ShellParser.toCommandLine(command),
-            standardOutReader,
-            new TextStreamReader(),
-            processIOThreadPool);
+                processBuilder.start(),
+                ShellParser.toCommandLine(processBuilder.command()),
+                standardOutReader,
+                new TextStreamReader(),
+                processIOThreadPool);
     }
 
     /***************************************************************************
@@ -184,11 +204,4 @@ public class AsyncProcess<T> {
             () -> errorReader.read(process.getErrorStream())
         );
     }
-
-    private static Process startProcess(final String[] command) throws IOException {
-        ProcessBuilder builder = new ProcessBuilder(command);
-        return builder.start();
-    }
-
-
 }
