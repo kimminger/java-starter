@@ -4,8 +4,11 @@ package com.elderbyte.commons.process;
 import com.elderbyte.commons.exceptions.ArgumentNullException;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,6 +41,8 @@ public class ProcessTemplate {
     private final List<String> arguments = new ArrayList<>();
     private ExecutorService processIOThreadPool = DEFAULT_PROCESS_IO_THREAD_POOL;
 
+    private final Map<String, String> envVariables = new HashMap<>();
+    private Path directory;
 
     /***************************************************************************
      *                                                                         *
@@ -104,6 +109,30 @@ public class ProcessTemplate {
     }
 
     /**
+     * Process working directory
+     * @param directory The process working directory
+     */
+    public ProcessTemplate workingDir(Path directory){
+
+        if(directory == null) throw new ArgumentNullException("directory");
+
+        this.directory = directory;
+        return this;
+    }
+
+    /**
+     * Set an environment variable for the process to use
+     */
+    public ProcessTemplate setEnv(String key, String value){
+
+        if(key == null) throw new ArgumentNullException("key");
+
+        this.envVariables.put(key, value);
+        return this;
+    }
+
+
+    /**
      * Starts a new process from this process-template with a default std-out text reader.
      * @return Returns an async-process
      * @throws IOException Thrown when there was a problem starting the process.
@@ -123,7 +152,11 @@ public class ProcessTemplate {
      */
     public <T> AsyncProcess<T> start(StreamReader<T> stdOutReader) throws IOException {
         if(stdOutReader == null) throw new ArgumentNullException("stdOutReader");
-        return AsyncProcess.start(buildCommand(), stdOutReader, processIOThreadPool);
+
+        var processBuilder = new ProcessBuilder(buildCommand());
+        processBuilder.directory(directory.toFile());
+        processBuilder.environment().putAll(envVariables);
+        return AsyncProcess.start(processBuilder, stdOutReader, processIOThreadPool);
     }
 
     @Override
@@ -137,10 +170,7 @@ public class ProcessTemplate {
      *                                                                         *
      **************************************************************************/
 
-
     private String[] buildCommand(){
         return arguments.toArray(new String[arguments.size()]);
     }
-
-
 }
