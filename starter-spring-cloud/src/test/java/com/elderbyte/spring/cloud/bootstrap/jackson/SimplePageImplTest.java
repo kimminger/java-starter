@@ -1,10 +1,11 @@
 package com.elderbyte.spring.cloud.bootstrap.jackson;
 
-import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.elderbyte.spring.cloud.bootstrap.jackson.PageJacksonModule.SimplePageImpl;
+
+import java.util.Arrays;
 
 
 public class SimplePageImplTest {
@@ -15,7 +16,7 @@ public class SimplePageImplTest {
     public void hasNext() throws Exception {
 
         PageJacksonModule.SimplePageImpl<Object> page = new SimplePageImpl<>(
-                Lists.newArrayList(new Object(), new Object()),
+                Arrays.asList(new Object(), new Object()),
                 1,
                 30,
                 90
@@ -27,7 +28,7 @@ public class SimplePageImplTest {
     @Test
     public void hasPrevious() throws Exception {
         SimplePageImpl<Object> page = new SimplePageImpl<>(
-                Lists.newArrayList(new Object(), new Object()),
+                Arrays.asList(new Object(), new Object()),
                 1,
                 30,
                 90
@@ -39,7 +40,7 @@ public class SimplePageImplTest {
     @Test
     public void nextPageable() throws Exception {
         SimplePageImpl<Object> page = new SimplePageImpl<>(
-                Lists.newArrayList(new Object(), new Object()),
+                Arrays.asList(new Object(), new Object()),
                 1,
                 30,
                 90
@@ -50,7 +51,7 @@ public class SimplePageImplTest {
     @Test
     public void previousPageable() throws Exception {
         SimplePageImpl<Object> page = new SimplePageImpl<>(
-                Lists.newArrayList(new Object(), new Object()),
+                Arrays.asList(new Object(), new Object()),
                 1,
                 30,
                 90
