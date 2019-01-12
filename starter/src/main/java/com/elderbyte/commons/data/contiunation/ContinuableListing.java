@@ -47,6 +47,10 @@ public interface ContinuableListing<T> {
         return finiteChunk(content, maxChunkSize, (long)content.size(), ContinuationToken.Empty);
     }
 
+    static <T> ContinuableListing<T> finiteChunk(List<T> content, int maxChunkSize, ContinuationToken current){
+        return finiteChunk(content, maxChunkSize, null, current);
+    }
+
     static <T> ContinuableListing<T> finiteChunk(List<T> content, int maxChunkSize, Long total, ContinuationToken current){
         return continuable(content, maxChunkSize, total, current, ContinuationToken.Empty);
     }
