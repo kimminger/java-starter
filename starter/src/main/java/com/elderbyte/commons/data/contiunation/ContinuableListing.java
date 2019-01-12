@@ -32,7 +32,7 @@ public interface ContinuableListing<T> {
     }
 
     static <T> ContinuableListing<T> empty(ContinuationToken current){
-        return finiteChunk(new ArrayList<>(), 0, current);
+        return finiteChunk(new ArrayList<>(), 0, (long)0, current);
     }
 
     static <T> ContinuableListing<T> finiteChunk(T... content){
@@ -40,15 +40,11 @@ public interface ContinuableListing<T> {
     }
 
     static <T> ContinuableListing<T> finiteChunk(List<T> content){
-        return continuable(content, content.size(), ContinuationToken.Empty, ContinuationToken.Empty);
+        return finiteChunk(content, content.size());
     }
 
     static <T> ContinuableListing<T> finiteChunk(List<T> content, int maxChunkSize){
-        return continuable(content, maxChunkSize, ContinuationToken.Empty, ContinuationToken.Empty);
-    }
-
-    static <T> ContinuableListing<T> finiteChunk(List<T> content, int maxChunkSize, ContinuationToken current){
-        return continuable(content, maxChunkSize, current, ContinuationToken.Empty);
+        return finiteChunk(content, maxChunkSize, (long)content.size(), ContinuationToken.Empty);
     }
 
     static <T> ContinuableListing<T> finiteChunk(List<T> content, int maxChunkSize, Long total, ContinuationToken current){
