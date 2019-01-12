@@ -8,6 +8,11 @@ A java common library to streamline basic java code.
 * Common Exceptions
 * `ContinuationListing<T>`, `ContinuationToken` Support
 
+## starter-spring-cloud  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-cloud/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-cloud/_latestVersion)
+
+Provides Spring Cloud Auto Configuration for encoders of common data types and improved exception handlers.
+* Out of the box support for Pageable, Page<T>, ContinuationListing<T> in RestControllers and Feign Clients.
+* Support Optional mapper on Feign client.
 
 ## starter-spring-jpa  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-jpa/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-jpa/_latestVersion)
 
