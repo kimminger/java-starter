@@ -9,7 +9,7 @@ buildscript {
 }
 
 allprojects {
-    version =  '5.1.0'
+    version =  '5.2.0'
 
     tasks.withType(Javadoc) {
         // Avoid failing builds because of java-doc errors
@@ -20,7 +20,7 @@ allprojects {
 
 subprojects {
     ext {
-        springBootVersionBase = '2.1.1'
+        springBootVersionBase = '2.1.2'
         springBootVersion = springBootVersionBase + '.RELEASE'
         springCloudVersion = 'Greenwich.RC2'
         feignOkHttpVersion = '10.0.1'
