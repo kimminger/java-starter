@@ -154,7 +154,9 @@ public class ProcessTemplate {
         if(stdOutReader == null) throw new ArgumentNullException("stdOutReader");
 
         var processBuilder = new ProcessBuilder(buildCommand());
-        processBuilder.directory(directory.toFile());
+
+        if(directory != null) { processBuilder.directory(directory.toFile()); }
+
         processBuilder.environment().putAll(envVariables);
         return AsyncProcess.start(processBuilder, stdOutReader, processIOThreadPool);
     }
