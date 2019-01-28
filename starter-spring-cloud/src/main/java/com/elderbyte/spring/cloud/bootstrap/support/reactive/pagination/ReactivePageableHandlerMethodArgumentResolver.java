@@ -20,12 +20,12 @@ import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.SyncHandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
 
-import javax.annotation.Nonnull;
 
 /**
  * Extracts paging information from web requests and thus allows injecting {@link Pageable} instances into WebFlux
@@ -67,7 +67,7 @@ public class ReactivePageableHandlerMethodArgumentResolver extends PageableHandl
 	 * (non-Javadoc)
 	 * @see org.springframework.web.reactive.result.method.SyncHandlerMethodArgumentResolver#resolveArgumentValue(org.springframework.core.MethodParameter, org.springframework.web.reactive.BindingContext, org.springframework.web.server.ServerWebExchange)
 	 */
-	@Nonnull
+	@Nullable
 	@Override
 	public Pageable resolveArgumentValue(MethodParameter parameter, BindingContext bindingContext,
 			ServerWebExchange exchange) {

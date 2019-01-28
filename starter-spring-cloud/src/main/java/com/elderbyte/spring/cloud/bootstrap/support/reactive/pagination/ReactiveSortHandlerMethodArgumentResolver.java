@@ -18,12 +18,12 @@ package com.elderbyte.spring.cloud.bootstrap.support.reactive.pagination;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.SyncHandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -48,7 +48,7 @@ public class ReactiveSortHandlerMethodArgumentResolver extends SortHandlerMethod
 	 *(non-Javadoc)
 	 * @see org.springframework.web.reactive.result.method.SyncHandlerMethodArgumentResolver#resolveArgumentValue(org.springframework.core.MethodParameter, org.springframework.web.reactive.BindingContext, org.springframework.web.server.ServerWebExchange)
 	 */
-	@Nonnull
+	@Nullable
 	@Override
 	public Sort resolveArgumentValue(MethodParameter parameter, BindingContext bindingContext,
 			ServerWebExchange exchange) {

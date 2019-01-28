@@ -147,7 +147,6 @@ public class AsyncProcess<T> {
      * @throws ProcessErrorException Thrown when there was an error in this child process
      * @throws InterruptedException Thrown when the process was interrupted
      * @throws TimeoutException Thrown when the process took longer than the given timeout
-     * @return returns the process exit value
      */
     public void await(long timeout, TimeUnit unit) throws ProcessErrorException, InterruptedException, TimeoutException {
         long startTime = System.nanoTime();
