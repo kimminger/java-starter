@@ -1,4 +1,4 @@
-package com.elderbyte.commons.data.contiunation.worker;
+package com.elderbyte.spring.boot.bootstrap.data.continuation.worker;
 
 public class BatchWorkerException extends RuntimeException {
 

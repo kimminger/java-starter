@@ -1,4 +1,4 @@
-package com.elderbyte.commons.data.contiunation.worker.metrics;
+package com.elderbyte.spring.boot.bootstrap.data.continuation.worker.metrics;
 
 import java.util.Optional;
 
