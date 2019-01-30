@@ -1,15 +1,18 @@
-package com.elderbyte.spring.boot.bootstrap.data.continuation.worker;
+package com.elderbyte.commons.data.contiunation.worker;
 
 import com.elderbyte.commons.cancelation.CancellationToken;
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
-import com.elderbyte.spring.boot.bootstrap.data.continuation.worker.metrics.Metrics;
+import com.elderbyte.commons.data.contiunation.worker.metrics.Metrics;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
+
+import static org.junit.Assert.*;
 
 public class ContinuableBatchWorkerTest {
 

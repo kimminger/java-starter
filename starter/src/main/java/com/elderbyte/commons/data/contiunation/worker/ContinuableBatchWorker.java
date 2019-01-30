@@ -1,12 +1,13 @@
-package com.elderbyte.spring.boot.bootstrap.data.continuation.worker;
+package com.elderbyte.commons.data.contiunation.worker;
 
 import com.elderbyte.commons.cancelation.CancellationToken;
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
-import com.elderbyte.spring.boot.bootstrap.data.continuation.worker.metrics.Metrics;
-import com.elderbyte.spring.boot.bootstrap.data.continuation.worker.metrics.MetricsReporter;
+import com.elderbyte.commons.data.contiunation.worker.metrics.Metrics;
+import com.elderbyte.commons.data.contiunation.worker.metrics.MetricsReporter;
 import com.elderbyte.commons.exceptions.ArgumentNullException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
