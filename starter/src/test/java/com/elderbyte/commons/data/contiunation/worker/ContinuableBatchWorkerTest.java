@@ -56,8 +56,8 @@ public class ContinuableBatchWorkerTest {
         var records = new ArrayList<WorkerBatchMetricRecord>();
 
         ContinuableBatchWorker.worker(mockChunkLoader, batch -> {})
+                    .instrumentTo(records::add)
                     .processAll(
-                            records::add,
                             CancellationToken.Never
                     );
 

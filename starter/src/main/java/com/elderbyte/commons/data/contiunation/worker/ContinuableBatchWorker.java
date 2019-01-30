@@ -59,6 +59,8 @@ public class ContinuableBatchWorker<T> {
     private final Function<String, ContinuableListing<T>> batchLoader;
     private final Consumer<ContinuableListing<T>> batchProcessor;
 
+    private Consumer<WorkerBatchMetricRecord> instrumentationCb = null;
+
     /***************************************************************************
      *                                                                         *
      * Constructor                                                             *
@@ -82,31 +84,26 @@ public class ContinuableBatchWorker<T> {
      *                                                                         *
      **************************************************************************/
 
+    public ContinuableBatchWorker instrumentTo(Consumer<WorkerBatchMetricRecord> instrumentationCb){
+        this.instrumentationCb = instrumentationCb;
+        return this;
+    }
+
     /**
      * Process all items from the continuable source.
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
     public void processAll() throws BatchWorkerException {
-        processAll(metrics -> {});
+        processAll(CancellationToken.Never);
     }
 
     /**
      * Process all items from the continuable source.
-     * @param progressCallback Callback for metrics report while the worker is processing
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
-    public void processAll(Consumer<WorkerBatchMetricRecord> progressCallback) throws BatchWorkerException {
-        processAll(progressCallback, CancellationToken.Never);
-    }
-
-    /**
-     * Process all items from the continuable source.
-     * @param progressCallback Callback for metrics report while the worker is processing
-     * @throws BatchWorkerException Thrown when there was an issue processing a batch.
-     */
-    public void processAll(Consumer<WorkerBatchMetricRecord> progressCallback,
+    public void processAll(
                            CancellationToken cancellationToken) throws BatchWorkerException {
-        processAllFrom(null, progressCallback, cancellationToken);
+        processAllFrom(null, cancellationToken);
     }
 
     /**
@@ -115,24 +112,20 @@ public class ContinuableBatchWorker<T> {
      * @throws BatchWorkerException
      */
     public void processAllFrom(String startToken) throws BatchWorkerException {
-        processAllFrom(startToken, metrics -> {}, CancellationToken.Never);
+        processAllFrom(startToken, CancellationToken.Never);
     }
 
     /**
      * Process all items from the continuable source starting at the given token.
      * @param startToken The initial token to use - useful to manually resume work. If null starts from the beginning.
-     * @param progressCallback Callback for metrics report while the worker is processing
      * @param cancellationToken Token to cancel processing - has to be provided.
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
     public void processAllFrom(
             String startToken,
-            Consumer<WorkerBatchMetricRecord> progressCallback,
             CancellationToken cancellationToken) throws BatchWorkerException, CancellationException {
 
-        if(progressCallback == null) throw new ArgumentNullException("progressCallback");
         if(cancellationToken == null) throw new ArgumentNullException("cancellationToken");
-
 
         String nextToken = startToken;
 
@@ -155,13 +148,17 @@ public class ContinuableBatchWorker<T> {
 
             var processingTime = System.nanoTime()-startProcessing;
 
-            progressCallback.accept(
-                    WorkerBatchMetricRecord.fromListing(
-                            chunk,
-                            loadingTime,
-                            processingTime
-                    )
-            );
+            var instrument = instrumentationCb;
+            if (instrument != null) {
+                instrument.accept(
+                        WorkerBatchMetricRecord.fromListing(
+                                chunk,
+                                loadingTime,
+                                processingTime
+                        )
+                );
+            }
+
 
         } while (nextToken != null);
     }
