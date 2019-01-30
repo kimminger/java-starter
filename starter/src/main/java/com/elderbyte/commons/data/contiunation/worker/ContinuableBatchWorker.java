@@ -59,7 +59,8 @@ public class ContinuableBatchWorker<T> {
     private final Function<String, ContinuableListing<T>> batchLoader;
     private final Consumer<ContinuableListing<T>> batchProcessor;
 
-    private Consumer<WorkerBatchMetricRecord> instrumentationCb = null;
+    private Consumer<ProcessingMetric> processingCb = null;
+    private Consumer<LoadingMetric> loadingCb = null;
 
     /***************************************************************************
      *                                                                         *
@@ -84,10 +85,16 @@ public class ContinuableBatchWorker<T> {
      *                                                                         *
      **************************************************************************/
 
-    public ContinuableBatchWorker instrumentTo(Consumer<WorkerBatchMetricRecord> instrumentationCb){
-        this.instrumentationCb = instrumentationCb;
+    public ContinuableBatchWorker<T> loadingMetrics(Consumer<LoadingMetric> loadingCb){
+        this.loadingCb = loadingCb;
         return this;
     }
+
+    public ContinuableBatchWorker<T> processingMetrics(Consumer<ProcessingMetric> processingCb){
+        this.processingCb = processingCb;
+        return this;
+    }
+
 
     /**
      * Process all items from the continuable source.
@@ -130,35 +137,12 @@ public class ContinuableBatchWorker<T> {
         String nextToken = startToken;
 
         do {
-
             // Check if processing should be aborted
             cancellationToken.throwIfCancellationRequested();
 
-            long startLoading = System.nanoTime();
-
             var chunk = loadNext(nextToken);
 
-            long loadingTime = System.nanoTime()-startLoading;
-
-            long startProcessing = System.nanoTime();
-
-            processAll(chunk);
-
-            nextToken = chunk.getNextContinuationToken();
-
-            var processingTime = System.nanoTime()-startProcessing;
-
-            var instrument = instrumentationCb;
-            if (instrument != null) {
-                instrument.accept(
-                        WorkerBatchMetricRecord.fromListing(
-                                chunk,
-                                loadingTime,
-                                processingTime
-                        )
-                );
-            }
-
+            nextToken = processAll(chunk);
 
         } while (nextToken != null);
     }
@@ -169,19 +153,63 @@ public class ContinuableBatchWorker<T> {
      *                                                                         *
      **************************************************************************/
 
+
     private ContinuableListing<T> loadNext(String nextToken){
+
+        long startLoading = System.nanoTime();
+
         try {
-            return batchLoader.apply(nextToken);
+            var listing = batchLoader.apply(nextToken);
+
+            long loadingTime = System.nanoTime()-startLoading;
+
+            record(LoadingMetric.fromTime(loadingTime));
+
+            return listing;
+
         }catch (Exception e){
+            record(LoadingMetric.error(e, System.nanoTime()-startLoading));
             throw new BatchWorkerException("Failed to load next batch with nextToken: " + nextToken, e);
         }
     }
 
-    private void processAll(ContinuableListing<T> batchListing){
+    private String processAll(ContinuableListing<T> listing){
+
+        long startProcessing = System.nanoTime();
+
         try {
-            batchProcessor.accept(batchListing);
+            batchProcessor.accept(listing);
+
+            var processingTime = System.nanoTime()-startProcessing;
+
+            record(
+                    ProcessingMetric.fromListing(
+                            listing,
+                            processingTime
+                    )
+            );
+
+            return listing.getNextContinuationToken();
+
         }catch (Exception e){
-            throw new BatchWorkerException("Failed to process item batch!", e);
+            record(ProcessingMetric.error(e, listing,System.nanoTime()-startProcessing));
+            throw new BatchWorkerException("Failed to process batch listing!", e);
+        }
+    }
+
+    private void record(LoadingMetric metric){
+        var instrument = loadingCb;
+        if(instrument != null){
+            instrument.accept(
+                    metric
+            );
+        }
+    }
+
+    private void record(ProcessingMetric metric){
+        var instrument = processingCb;
+        if (instrument != null) {
+            instrument.accept(metric);
         }
     }
 

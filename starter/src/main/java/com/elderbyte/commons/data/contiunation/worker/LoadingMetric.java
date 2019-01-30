@@ -1,15 +1,6 @@
 package com.elderbyte.commons.data.contiunation.worker;
 
-import com.elderbyte.commons.data.contiunation.ContinuableListing;
-
-import java.util.Optional;
-
-/**
- * Represents metric record of a single batch.
- *
- * This class is immutable
- */
-public class WorkerBatchMetricRecord {
+public class LoadingMetric extends BaseMetric {
 
     /***************************************************************************
      *                                                                         *
@@ -17,13 +8,14 @@ public class WorkerBatchMetricRecord {
      *                                                                         *
      **************************************************************************/
 
-    public static WorkerBatchMetricRecord fromListing(ContinuableListing<?> listing, long loadingTime, long processingTime){
-        return new WorkerBatchMetricRecord(
-                listing.getTotal(),
-                listing.getContent().size(),
-                loadingTime,
-                processingTime
-            );
+    public static LoadingMetric fromTime(long loadingTime){
+        return new LoadingMetric(
+                loadingTime
+        );
+    }
+
+    public static LoadingMetric error(Throwable throwable, long loadingTime){
+        return new LoadingMetric(loadingTime, throwable);
     }
 
     /***************************************************************************
@@ -33,24 +25,10 @@ public class WorkerBatchMetricRecord {
      **************************************************************************/
 
     /**
-     * The current estimated total of all items.
-     */
-    private final Long totalItems;
-
-    /**
-     * The number of items in this batch
-     */
-    private final int batchSize;
-
-    /**
      * The duration of this batch loading [nano]
      */
     private final long batchLoadingTime;
 
-    /**
-     * The duration of this batch processing [nano]
-     */
-    private final long batchProcessingTime;
 
     /***************************************************************************
      *                                                                         *
@@ -58,11 +36,13 @@ public class WorkerBatchMetricRecord {
      *                                                                         *
      **************************************************************************/
 
-    public WorkerBatchMetricRecord(Long totalItems, int batchSize, long batchLoadingTime, long batchProcessingTime) {
-        this.totalItems = totalItems;
-        this.batchSize = batchSize;
+    public LoadingMetric(long batchLoadingTime) {
+        this(batchLoadingTime, null);
+    }
+
+    public LoadingMetric(long batchLoadingTime, Throwable throwable){
+        super(throwable);
         this.batchLoadingTime = batchLoadingTime;
-        this.batchProcessingTime = batchProcessingTime;
     }
 
     /***************************************************************************
@@ -71,19 +51,7 @@ public class WorkerBatchMetricRecord {
      *                                                                         *
      **************************************************************************/
 
-    public Optional<Long> getTotalItems() {
-        return Optional.ofNullable(totalItems);
-    }
-
-    public int getBatchSize() {
-        return batchSize;
-    }
-
     public long getBatchLoadingTime() {
         return batchLoadingTime;
-    }
-
-    public long getBatchProcessingTime() {
-        return batchProcessingTime;
     }
 }

@@ -35,15 +35,19 @@ public class ContinuableWorkerInstrumented {
     }
 
     public void instrument(ContinuableBatchWorker<?> worker){
-        worker.instrumentTo(record -> {
+        worker
+                .processingMetrics(record -> {
 
-            totalItemsValue = record.getTotalItems().orElse(0L);
+                    totalItemsValue = record.getTotalItems().orElse(0L);
 
-            handledItems.increment(record.getBatchSize());
+                    handledItems.increment(record.getBatchSize());
 
-            loadingTimer.record(Duration.ofNanos(record.getBatchLoadingTime()));
-            processingTimer.record(Duration.ofNanos(record.getBatchProcessingTime()));
 
-        });
+                    processingTimer.record(Duration.ofNanos(record.getBatchProcessingTime()));
+
+                })
+                .loadingMetrics(r -> {
+                    loadingTimer.record(Duration.ofNanos(r.getBatchLoadingTime()));
+                });
     }
 }

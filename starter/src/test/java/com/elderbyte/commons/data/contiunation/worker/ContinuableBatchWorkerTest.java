@@ -53,25 +53,29 @@ public class ContinuableBatchWorkerTest {
     @Test
     public void processAll() {
 
-        var records = new ArrayList<WorkerBatchMetricRecord>();
+        var processingMetrics = new ArrayList<ProcessingMetric>();
+        var loadingMetrics = new ArrayList<LoadingMetric>();
 
         ContinuableBatchWorker.worker(mockChunkLoader, batch -> {})
-                    .instrumentTo(records::add)
+                .loadingMetrics(loadingMetrics::add)
+                .processingMetrics(processingMetrics::add)
                     .processAll(
                             CancellationToken.Never
                     );
 
-        Assert.assertEquals(3, records.size(), 0);
+        Assert.assertEquals(3, processingMetrics.size(), 0);
+        Assert.assertEquals(3, loadingMetrics.size(), 0);
 
-        Assert.assertEquals(10, records.get(0).getBatchSize());
-        Assert.assertEquals(10, records.get(1).getBatchSize());
-        Assert.assertEquals( 8, records.get(2).getBatchSize());
+        Assert.assertEquals(10, processingMetrics.get(0).getBatchSize());
+        Assert.assertEquals(10, processingMetrics.get(1).getBatchSize());
+        Assert.assertEquals( 8, processingMetrics.get(2).getBatchSize());
+
 
         // Assert.assertEquals(100, calcProgress(records), 0);
     }
 
     /*
-    private double calcProgress(WorkerBatchMetricRecord metrics){
+    private double calcProgress(ProcessingMetric metrics){
         return (100d / (double)metrics.getTotalItems().orElse(0L)) * (double)metrics.getBatchSize();
     }*/
 }
