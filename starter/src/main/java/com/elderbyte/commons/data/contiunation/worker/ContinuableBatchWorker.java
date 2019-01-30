@@ -2,6 +2,8 @@ package com.elderbyte.commons.data.contiunation.worker;
 
 import com.elderbyte.commons.cancelation.CancellationToken;
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
+import com.elderbyte.commons.data.contiunation.worker.metrics.Metrics;
+import com.elderbyte.commons.data.contiunation.worker.metrics.MetricsReporter;
 import com.elderbyte.commons.exceptions.ArgumentNullException;
 
 import java.util.List;
@@ -143,19 +145,24 @@ public class ContinuableBatchWorker<T> {
             // Check if processing should be aborted
             cancellationToken.throwIfCancellationRequested();
 
-            long start = System.nanoTime();
+            long startLoading = System.nanoTime();
 
             var chunk = loadNext(nextToken);
 
-            var items = chunk.getContent();
+            long loadingTime = System.nanoTime()-startLoading;
 
+            reporter.reportLoadingBatch(loadingTime);
+
+            long startProcessing = System.nanoTime();
+
+            var items = chunk.getContent();
             var currentToken = nextToken;
 
             processAll(items, currentToken);
 
             nextToken = chunk.getNextContinuationToken();
 
-            reporter.reportProcessedBatch(items.size(), System.nanoTime()-start, chunk.getTotal(), currentToken, nextToken);
+            reporter.reportProcessedBatch(items.size(), System.nanoTime()-startProcessing, chunk.getTotal(), currentToken, nextToken);
 
             progressCallback.accept(reporter.getSnapshot());
 
@@ -186,126 +193,4 @@ public class ContinuableBatchWorker<T> {
         }
     }
 
-    /***************************************************************************
-     *                                                                         *
-     * Inner class                                                             *
-     *                                                                         *
-     **************************************************************************/
-
-    private static class MetricsReporter {
-
-        private Long totalItems = null;
-        private String completedToken = null;
-        private String nextToken = null;
-
-        private int processedItems;
-        private int processedBatches;
-        private long batchMaxTimeMs = 0;
-        private long batchMinTimeMs = Long.MAX_VALUE;
-        private long totalTimeNano = 0;
-
-        public void reportProcessedBatch(int items, long nanoTime, Long total, String completedToken, String nextToken){
-
-            this.totalItems = total;
-            this.completedToken = completedToken;
-            this.nextToken = nextToken;
-
-            this.totalTimeNano += nanoTime;
-            this.processedItems += items;
-            this.processedBatches++;
-
-            var msTime = nanoToMillis(nanoTime);
-            this.batchMaxTimeMs = Math.max(batchMaxTimeMs, msTime);
-            this.batchMinTimeMs = Math.min(batchMinTimeMs, msTime);
-        }
-
-        public Metrics getSnapshot(){
-            return new Metrics(
-                    totalItems,
-                    completedToken,
-                    nextToken,
-                    processedItems,
-                    processedBatches,
-                    batchMaxTimeMs,
-                    batchMinTimeMs,
-                    nanoToMillis(totalTimeNano)
-            );
-        }
-
-        private long nanoToMillis(long nano){
-            return nano / (1000*1000);
-        }
-    }
-
-    public static class Metrics {
-
-        private final Long totalItems;
-        private final String completedToken;
-        private final String nextToken;
-        private final int processedItems;
-        private final int processedBatches;
-        private final long batchMaxTimeMs;
-        private final long batchMinTimeMs;
-        private final long totalTimeMs;
-
-        private Metrics(
-                Long totalItems,
-                String completedToken,
-                String nextToken,
-                int processedItems,
-                int processedBatches,
-                long batchMaxTimeMs,
-                long batchMinTimeMs,
-                long totalTimeMs) {
-
-            this.completedToken = completedToken;
-            this.nextToken = nextToken;
-            this.totalItems = totalItems;
-            this.processedItems = processedItems;
-            this.processedBatches = processedBatches;
-            this.batchMaxTimeMs = batchMaxTimeMs;
-            this.batchMinTimeMs = batchMinTimeMs;
-            this.totalTimeMs = totalTimeMs;
-        }
-
-        public int getProcessedItems() {
-            return processedItems;
-        }
-
-        public int getProcessedBatches() {
-            return processedBatches;
-        }
-
-        public long getBatchMaxTimeMs() {
-            return batchMaxTimeMs;
-        }
-
-        public long getBatchMinTimeMs() {
-            return batchMinTimeMs;
-        }
-
-        public long getTotalTimeMs() {
-            return totalTimeMs;
-        }
-
-        public Optional<Long> getTotalItems() {
-            return Optional.ofNullable(totalItems);
-        }
-
-        /**
-         * The continuation token of the last completed batch.
-         * Might be null for the first batch.
-         */
-        public String getCompletedToken() {
-            return completedToken;
-        }
-
-        /**
-         * The next continuation token of the last completed batch.
-         * Might be null for the last batch.
-         */
-        public String getNextToken() {
-            return nextToken;
-        }
-    }
 }

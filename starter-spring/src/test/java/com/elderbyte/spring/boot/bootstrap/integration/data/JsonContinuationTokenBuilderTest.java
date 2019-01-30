@@ -1,7 +1,7 @@
-package com.elderbyte.spring.cloud.bootstrap.integration.data;
+package com.elderbyte.spring.boot.bootstrap.integration.data;
 
 import com.elderbyte.commons.data.contiunation.JsonContinuationTokenBuilder;
-import com.elderbyte.spring.cloud.bootstrap.integration.IntegrationTestApp;
+import com.elderbyte.spring.boot.bootstrap.integration.IntegrationTestApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,11 +1,10 @@
-package com.elderbyte.spring.cloud.bootstrap.jackson;
+package com.elderbyte.spring.boot.bootstrap.data.pagination;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.*;
 
 import java.util.Iterator;

@@ -3,15 +3,10 @@ package com.elderbyte.spring.cloud.bootstrap.feign;
 import feign.Response;
 import feign.Util;
 import feign.codec.Decoder;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Optional;
 
 /**

@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.data;
+package com.elderbyte.spring.boot.bootstrap.data;
 
 import com.elderbyte.commons.data.contiunation.JsonContinuationToken;
 import com.elderbyte.commons.data.contiunation.JsonContinuationTokenBuilder;
@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class DataConfiguration {
 
     @Bean
+    // @ConditionalOnBean(ObjectMapper.class) // TODO Dangerous -> will disable this bean when object mapper is later constructed
     public JsonContinuationTokenBuilder JsonContinuationTokenBuilder(ObjectMapper mapper){
         var builder = new JsonContinuationTokenBuilder(mapper);
         JsonContinuationToken.setBuilder(builder);

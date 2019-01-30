@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.integration;
+package com.elderbyte.spring.boot.bootstrap.integration;
 
 import com.elderbyte.spring.boot.bootstrap.data.pagination.PageJacksonModule;
 import org.junit.Assert;
@@ -21,12 +21,6 @@ public class AppContextTests {
     @Test
     public void contextLoads(){
         Assert.assertTrue(applicationContext != null);
-    }
-
-
-    @Test // expected = NoSuchBeanDefinitionException.class
-    public void ensurePageJacksonModuleIsPresent(){
-        applicationContext.getBean(PageJacksonModule.class);
     }
 
 }

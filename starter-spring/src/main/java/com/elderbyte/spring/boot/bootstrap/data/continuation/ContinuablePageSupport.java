@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.support;
+package com.elderbyte.spring.boot.bootstrap.data.continuation;
 
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuationToken;

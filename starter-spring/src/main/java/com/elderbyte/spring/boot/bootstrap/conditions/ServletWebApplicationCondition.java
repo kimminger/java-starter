@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.conditions;
+package com.elderbyte.spring.boot.bootstrap.conditions;
 
 import org.springframework.boot.WebApplicationType;
 

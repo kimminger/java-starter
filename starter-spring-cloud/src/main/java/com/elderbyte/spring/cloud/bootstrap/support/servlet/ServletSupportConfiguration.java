@@ -1,6 +1,6 @@
 package com.elderbyte.spring.cloud.bootstrap.support.servlet;
 
-import com.elderbyte.spring.cloud.bootstrap.conditions.ServletWebApplicationCondition;
+import com.elderbyte.spring.boot.bootstrap.conditions.ServletWebApplicationCondition;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;

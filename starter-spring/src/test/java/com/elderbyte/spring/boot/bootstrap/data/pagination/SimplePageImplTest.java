@@ -1,9 +1,8 @@
-package com.elderbyte.spring.cloud.bootstrap.jackson;
+package com.elderbyte.spring.boot.bootstrap.data.pagination;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.elderbyte.spring.cloud.bootstrap.jackson.PageJacksonModule.SimplePageImpl;
 
 import java.util.Arrays;
 
@@ -15,7 +14,7 @@ public class SimplePageImplTest {
     @Test
     public void hasNext() throws Exception {
 
-        PageJacksonModule.SimplePageImpl<Object> page = new SimplePageImpl<>(
+        PageJacksonModule.SimplePageImpl<Object> page = new PageJacksonModule.SimplePageImpl<>(
                 Arrays.asList(new Object(), new Object()),
                 1,
                 30,
@@ -27,7 +26,7 @@ public class SimplePageImplTest {
 
     @Test
     public void hasPrevious() throws Exception {
-        SimplePageImpl<Object> page = new SimplePageImpl<>(
+        PageJacksonModule.SimplePageImpl<Object> page = new PageJacksonModule.SimplePageImpl<>(
                 Arrays.asList(new Object(), new Object()),
                 1,
                 30,
@@ -39,7 +38,7 @@ public class SimplePageImplTest {
 
     @Test
     public void nextPageable() throws Exception {
-        SimplePageImpl<Object> page = new SimplePageImpl<>(
+        PageJacksonModule.SimplePageImpl<Object> page = new PageJacksonModule.SimplePageImpl<>(
                 Arrays.asList(new Object(), new Object()),
                 1,
                 30,
@@ -50,7 +49,7 @@ public class SimplePageImplTest {
 
     @Test
     public void previousPageable() throws Exception {
-        SimplePageImpl<Object> page = new SimplePageImpl<>(
+        PageJacksonModule.SimplePageImpl<Object> page = new PageJacksonModule.SimplePageImpl<>(
                 Arrays.asList(new Object(), new Object()),
                 1,
                 30,

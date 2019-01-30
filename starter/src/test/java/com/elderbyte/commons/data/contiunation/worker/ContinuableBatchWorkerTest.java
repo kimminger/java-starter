@@ -3,6 +3,7 @@ package com.elderbyte.commons.data.contiunation.worker;
 import com.elderbyte.commons.cancelation.CancellationToken;
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
+import com.elderbyte.commons.data.contiunation.worker.metrics.Metrics;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -55,7 +56,7 @@ public class ContinuableBatchWorkerTest {
     @Test
     public void processAll() {
 
-        var reports = new ArrayList<ContinuableBatchWorker.Metrics>();
+        var reports = new ArrayList<Metrics>();
 
         var result = ContinuableBatchWorker.worker(mockChunkLoader, batch -> {})
                     .processAll(progress -> {
@@ -74,7 +75,7 @@ public class ContinuableBatchWorkerTest {
         Assert.assertEquals(100, calcProgress(result), 0);
     }
 
-    private double calcProgress(ContinuableBatchWorker.Metrics metrics){
+    private double calcProgress(Metrics metrics){
         return (100d / (double)metrics.getTotalItems().orElse(0L)) * (double)metrics.getProcessedItems();
     }
 }

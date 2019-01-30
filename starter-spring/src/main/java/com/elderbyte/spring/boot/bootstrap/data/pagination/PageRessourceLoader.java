@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.support;
+package com.elderbyte.spring.boot.bootstrap.data.pagination;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

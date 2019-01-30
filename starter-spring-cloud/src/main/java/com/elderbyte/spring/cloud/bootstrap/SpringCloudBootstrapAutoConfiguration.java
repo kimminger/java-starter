@@ -1,7 +1,6 @@
 package com.elderbyte.spring.cloud.bootstrap;
 
 
-import com.elderbyte.spring.cloud.bootstrap.data.DataConfiguration;
 import com.elderbyte.spring.cloud.bootstrap.feign.DefaultFeignConfiguration;
 import com.elderbyte.spring.cloud.bootstrap.jackson.DefaultJacksonConfiguration;
 import com.elderbyte.spring.cloud.bootstrap.support.reactive.ReactiveWebSupportConfiguration;
@@ -14,10 +13,9 @@ import org.springframework.context.annotation.Import;
         DefaultFeignConfiguration.class,
         DefaultJacksonConfiguration.class,
         ServletSupportConfiguration.class,
-        ReactiveWebSupportConfiguration.class,
-        DataConfiguration.class
+        ReactiveWebSupportConfiguration.class
         })
-public class BootstrapAutoConfiguration {
+public class SpringCloudBootstrapAutoConfiguration {
 
 
 }

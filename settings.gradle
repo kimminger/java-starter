@@ -1,5 +1,6 @@
 
 include 'starter'
+include 'starter-spring'
 include 'starter-spring-cloud'
 include 'starter-spring-jpa'
 include 'starter-spring-mongo'

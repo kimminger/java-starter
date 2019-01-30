@@ -1,6 +1,6 @@
 package com.elderbyte.spring.cloud.bootstrap.support.reactive;
 
-import com.elderbyte.spring.cloud.bootstrap.conditions.ReactiveWebApplicationCondition;
+import com.elderbyte.spring.boot.bootstrap.conditions.ReactiveWebApplicationCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;

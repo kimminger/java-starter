@@ -1,7 +1,7 @@
 package com.elderbyte.spring.cloud.bootstrap.feign;
 
 
-import com.elderbyte.spring.cloud.bootstrap.jackson.PageJacksonModule;
+import com.elderbyte.spring.boot.bootstrap.data.pagination.PageJacksonModule;
 import com.fasterxml.jackson.databind.Module;
 import feign.codec.Decoder;
 import feign.codec.Encoder;

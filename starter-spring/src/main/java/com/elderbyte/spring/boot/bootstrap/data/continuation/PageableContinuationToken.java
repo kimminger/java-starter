@@ -1,7 +1,8 @@
-package com.elderbyte.spring.cloud.bootstrap.support;
+package com.elderbyte.spring.boot.bootstrap.data.continuation;
 
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
 import com.elderbyte.commons.data.contiunation.JsonContinuationToken;
+import com.elderbyte.spring.boot.bootstrap.data.pagination.PageableDto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
