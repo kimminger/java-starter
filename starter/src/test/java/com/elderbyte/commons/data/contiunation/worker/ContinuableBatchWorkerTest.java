@@ -3,16 +3,13 @@ package com.elderbyte.commons.data.contiunation.worker;
 import com.elderbyte.commons.cancelation.CancellationToken;
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
-import com.elderbyte.commons.data.contiunation.worker.metrics.Metrics;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
-import static org.junit.Assert.*;
 
 public class ContinuableBatchWorkerTest {
 
@@ -26,7 +23,7 @@ public class ContinuableBatchWorkerTest {
             listing = ContinuableListing.continuable(
                     Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"),
                     10,
-                    30L,
+                    28L,
                     ContinuationToken.from(token),
                     ContinuationToken.from("1")
             );
@@ -34,15 +31,15 @@ public class ContinuableBatchWorkerTest {
             listing = ContinuableListing.continuable(
                     Arrays.asList("11", "12", "13", "14", "15", "16", "17", "18", "19", "20"),
                     10,
-                    30L,
+                    28L,
                     ContinuationToken.from(token),
                     ContinuationToken.from("2")
             );
         }else if (token.equals("2")){
             listing = ContinuableListing.finiteChunk(
-                    Arrays.asList("21", "22", "23", "24", "25", "26", "27", "28", "29", "30"),
-                    10,
-                    30L,
+                    Arrays.asList("21", "22", "23", "24", "25", "26", "27", "28"),
+                    8,
+                    28L,
                     ContinuationToken.from(token)
             );
         }else{
@@ -56,26 +53,25 @@ public class ContinuableBatchWorkerTest {
     @Test
     public void processAll() {
 
-        var reports = new ArrayList<Metrics>();
+        var records = new ArrayList<WorkerBatchMetricRecord>();
 
-        var result = ContinuableBatchWorker.worker(mockChunkLoader, batch -> {})
-                    .processAll(progress -> {
-                        reports.add(progress);
-                    }, CancellationToken.Never);
+        ContinuableBatchWorker.worker(mockChunkLoader, batch -> {})
+                    .processAll(
+                            records::add,
+                            CancellationToken.Never
+                    );
 
+        Assert.assertEquals(3, records.size(), 0);
 
+        Assert.assertEquals(10, records.get(0).getBatchSize());
+        Assert.assertEquals(10, records.get(1).getBatchSize());
+        Assert.assertEquals( 8, records.get(2).getBatchSize());
 
-        Assert.assertEquals(3, reports.size(), 0);
-
-        Assert.assertEquals(33.3333, calcProgress(reports.get(0)), 0.1);
-        Assert.assertEquals(66.6666, calcProgress(reports.get(1)), 0.1);
-        Assert.assertEquals(100.0, calcProgress(reports.get(2)), 0.1);
-
-
-        Assert.assertEquals(100, calcProgress(result), 0);
+        // Assert.assertEquals(100, calcProgress(records), 0);
     }
 
-    private double calcProgress(Metrics metrics){
-        return (100d / (double)metrics.getTotalItems().orElse(0L)) * (double)metrics.getProcessedItems();
-    }
+    /*
+    private double calcProgress(WorkerBatchMetricRecord metrics){
+        return (100d / (double)metrics.getTotalItems().orElse(0L)) * (double)metrics.getBatchSize();
+    }*/
 }

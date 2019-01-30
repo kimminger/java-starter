@@ -2,14 +2,10 @@ package com.elderbyte.commons.data.contiunation.worker;
 
 import com.elderbyte.commons.cancelation.CancellationToken;
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
-import com.elderbyte.commons.data.contiunation.worker.metrics.Metrics;
-import com.elderbyte.commons.data.contiunation.worker.metrics.MetricsReporter;
 import com.elderbyte.commons.exceptions.ArgumentNullException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CancellationException;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -40,7 +36,7 @@ public class ContinuableBatchWorker<T> {
     public static <G> ContinuableBatchWorker<G> worker(
             Function<String, ContinuableListing<G>> batchLoader,
             Consumer<List<G>> batchProcessor){
-        return new ContinuableBatchWorker<>(batchLoader, (items, currentToken) -> batchProcessor.accept(items));
+        return new ContinuableBatchWorker<>(batchLoader, (listing) -> batchProcessor.accept(listing.getContent()));
     }
 
     /**
@@ -48,9 +44,9 @@ public class ContinuableBatchWorker<T> {
      * @param batchLoader Function which loads a continuable list of data by a continuation token
      * @param batchProcessor A processing function for a loaded chunk of data, including the current state token
      */
-    public static <G> ContinuableBatchWorker<G> worker(
+    public static <G> ContinuableBatchWorker<G> workerWithListing(
             Function<String, ContinuableListing<G>> batchLoader,
-            BiConsumer<List<G>, String> batchProcessor){
+            Consumer<ContinuableListing<G>> batchProcessor){
         return new ContinuableBatchWorker<>(batchLoader, batchProcessor);
     }
 
@@ -61,17 +57,17 @@ public class ContinuableBatchWorker<T> {
      **************************************************************************/
 
     private final Function<String, ContinuableListing<T>> batchLoader;
-    private final BiConsumer<List<T>, String> batchProcessor;
+    private final Consumer<ContinuableListing<T>> batchProcessor;
 
     /***************************************************************************
      *                                                                         *
-     * Public API                                                              *
+     * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
 
     private ContinuableBatchWorker(
             Function<String, ContinuableListing<T>> batchLoader,
-            BiConsumer<List<T>, String> batchProcessor
+            Consumer<ContinuableListing<T>> batchProcessor
     ){
         if(batchLoader == null) throw new ArgumentNullException("batchLoader");
         if(batchProcessor == null) throw new ArgumentNullException("batchProcessor");
@@ -90,8 +86,8 @@ public class ContinuableBatchWorker<T> {
      * Process all items from the continuable source.
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
-    public Metrics processAll() throws BatchWorkerException {
-        return processAll(metrics -> {});
+    public void processAll() throws BatchWorkerException {
+        processAll(metrics -> {});
     }
 
     /**
@@ -99,8 +95,8 @@ public class ContinuableBatchWorker<T> {
      * @param progressCallback Callback for metrics report while the worker is processing
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
-    public Metrics processAll(Consumer<Metrics> progressCallback) throws BatchWorkerException {
-        return processAll(progressCallback, CancellationToken.Never);
+    public void processAll(Consumer<WorkerBatchMetricRecord> progressCallback) throws BatchWorkerException {
+        processAll(progressCallback, CancellationToken.Never);
     }
 
     /**
@@ -108,8 +104,9 @@ public class ContinuableBatchWorker<T> {
      * @param progressCallback Callback for metrics report while the worker is processing
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
-    public Metrics processAll(Consumer<Metrics> progressCallback, CancellationToken cancellationToken) throws BatchWorkerException {
-        return processAllFrom(null, progressCallback, cancellationToken);
+    public void processAll(Consumer<WorkerBatchMetricRecord> progressCallback,
+                           CancellationToken cancellationToken) throws BatchWorkerException {
+        processAllFrom(null, progressCallback, cancellationToken);
     }
 
     /**
@@ -117,8 +114,8 @@ public class ContinuableBatchWorker<T> {
      * @param startToken The initial token to use - useful to manually resume work.
      * @throws BatchWorkerException
      */
-    public Metrics processAllFrom(String startToken) throws BatchWorkerException {
-        return processAllFrom(startToken, metrics -> {}, CancellationToken.Never);
+    public void processAllFrom(String startToken) throws BatchWorkerException {
+        processAllFrom(startToken, metrics -> {}, CancellationToken.Never);
     }
 
     /**
@@ -128,9 +125,9 @@ public class ContinuableBatchWorker<T> {
      * @param cancellationToken Token to cancel processing - has to be provided.
      * @throws BatchWorkerException Thrown when there was an issue processing a batch.
      */
-    public Metrics processAllFrom(
+    public void processAllFrom(
             String startToken,
-            Consumer<Metrics> progressCallback,
+            Consumer<WorkerBatchMetricRecord> progressCallback,
             CancellationToken cancellationToken) throws BatchWorkerException, CancellationException {
 
         if(progressCallback == null) throw new ArgumentNullException("progressCallback");
@@ -138,7 +135,6 @@ public class ContinuableBatchWorker<T> {
 
 
         String nextToken = startToken;
-        var reporter = new MetricsReporter();
 
         do {
 
@@ -151,24 +147,23 @@ public class ContinuableBatchWorker<T> {
 
             long loadingTime = System.nanoTime()-startLoading;
 
-            reporter.reportLoadingBatch(loadingTime);
-
             long startProcessing = System.nanoTime();
 
-            var items = chunk.getContent();
-            var currentToken = nextToken;
-
-            processAll(items, currentToken);
+            processAll(chunk);
 
             nextToken = chunk.getNextContinuationToken();
 
-            reporter.reportProcessedBatch(items.size(), System.nanoTime()-startProcessing, chunk.getTotal(), currentToken, nextToken);
+            var processingTime = System.nanoTime()-startProcessing;
 
-            progressCallback.accept(reporter.getSnapshot());
+            progressCallback.accept(
+                    WorkerBatchMetricRecord.fromListing(
+                            chunk,
+                            loadingTime,
+                            processingTime
+                    )
+            );
 
         } while (nextToken != null);
-
-        return reporter.getSnapshot();
     }
 
     /***************************************************************************
@@ -185,9 +180,9 @@ public class ContinuableBatchWorker<T> {
         }
     }
 
-    private void processAll(List<T> items, String currentToken){
+    private void processAll(ContinuableListing<T> batchListing){
         try {
-            batchProcessor.accept(items, currentToken);
+            batchProcessor.accept(batchListing);
         }catch (Exception e){
             throw new BatchWorkerException("Failed to process item batch!", e);
         }
