@@ -159,16 +159,16 @@ public class ContinuableBatchWorker<T> {
         long startLoading = System.nanoTime();
 
         try {
+
             var listing = batchLoader.apply(nextToken);
-
-            long loadingTime = System.nanoTime()-startLoading;
-
-            record(LoadingMetric.fromTime(loadingTime));
-
             if(listing == null){
                 throw new IllegalStateException("The loaded listing was null which is illegal!");
             }
 
+            long loadingTime = System.nanoTime()-startLoading;
+
+            record(LoadingMetric.fromTime(loadingTime));
+            
             return listing;
 
         }catch (Exception e){
