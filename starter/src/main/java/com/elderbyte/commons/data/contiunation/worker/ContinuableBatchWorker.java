@@ -165,6 +165,10 @@ public class ContinuableBatchWorker<T> {
 
             record(LoadingMetric.fromTime(loadingTime));
 
+            if(listing == null){
+                throw new IllegalStateException("The loaded listing was null which is illegal!");
+            }
+
             return listing;
 
         }catch (Exception e){
@@ -178,6 +182,8 @@ public class ContinuableBatchWorker<T> {
         long startProcessing = System.nanoTime();
 
         try {
+            if(listing == null) throw new IllegalStateException("The listing to process was null which is illegal!");
+
             batchProcessor.accept(listing);
 
             var processingTime = System.nanoTime()-startProcessing;

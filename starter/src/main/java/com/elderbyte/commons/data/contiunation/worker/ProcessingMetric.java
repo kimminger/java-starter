@@ -1,6 +1,7 @@
 package com.elderbyte.commons.data.contiunation.worker;
 
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
+import com.elderbyte.commons.exceptions.ArgumentNullException;
 
 import java.util.Optional;
 
@@ -18,6 +19,9 @@ public class ProcessingMetric extends BaseMetric {
      **************************************************************************/
 
     public static ProcessingMetric fromListing(ContinuableListing<?> listing, long processingTime){
+
+        if(listing == null) throw new ArgumentNullException("listing");
+
         return new ProcessingMetric(
                 listing.getTotal(),
                 listing.getContent().size(),
@@ -28,8 +32,8 @@ public class ProcessingMetric extends BaseMetric {
     public static ProcessingMetric error(Throwable throwable, ContinuableListing<?> listing, long processingTime){
         return new ProcessingMetric(
                 throwable,
-                listing.getTotal(),
-                listing.getContent().size(),
+                listing != null ? listing.getTotal() : null,
+                listing != null ? listing.getContent().size() : 0,
                 processingTime
         );
     }
