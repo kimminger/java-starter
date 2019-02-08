@@ -168,7 +168,7 @@ public class ContinuableBatchWorker<T> {
             long loadingTime = System.nanoTime()-startLoading;
 
             record(LoadingMetric.fromTime(loadingTime));
-            
+
             return listing;
 
         }catch (Exception e){
