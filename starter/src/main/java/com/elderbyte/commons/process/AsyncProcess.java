@@ -148,7 +148,7 @@ public class AsyncProcess<T> {
      * @throws InterruptedException Thrown when the process was interrupted
      * @throws TimeoutException Thrown when the process took longer than the given timeout
      */
-    public void await(long timeout, TimeUnit unit) throws ProcessErrorException, InterruptedException, TimeoutException {
+    public AsyncProcess<T> await(long timeout, TimeUnit unit) throws ProcessErrorException, InterruptedException, TimeoutException {
         long startTime = System.nanoTime();
         long rem = unit.toNanos(timeout);
 
@@ -165,7 +165,7 @@ public class AsyncProcess<T> {
 
                 if(exitCode == 0){
                     // By convention, a zero exit code means success
-                    return;
+                    return this;
                 }else{
                     // The process completed with an error which we translate into an exception
                     throw new ProcessErrorException(commandLine, exitCode, getErrorOutputAsText());

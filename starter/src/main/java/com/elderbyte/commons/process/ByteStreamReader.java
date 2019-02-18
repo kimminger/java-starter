@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class BufferedStreamReader<T> implements StreamReader<T>{
+public class ByteStreamReader implements StreamReader<byte[]>{
 
     private ByteArrayOutputStream out = new ByteArrayOutputStream();
     private Exception e;
@@ -20,14 +20,13 @@ public abstract class BufferedStreamReader<T> implements StreamReader<T>{
     }
 
     @Override
-    public abstract T getValue();
-
-    protected byte[] getBuffer() {
+    public byte[] getValue(){
         if(e != null){
             throw new RuntimeException("There was an error while reading the input stream.", e);
         }
         return out.toByteArray();
     }
+
 
     private static void copy(InputStream input, ByteArrayOutputStream out) throws IOException {
         byte[] buffer = new byte[8192];

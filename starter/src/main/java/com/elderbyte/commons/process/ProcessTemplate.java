@@ -4,6 +4,7 @@ package com.elderbyte.commons.process;
 import com.elderbyte.commons.exceptions.ArgumentNullException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 /**
  * A process builder/factory from which a native process can be configured and started.
@@ -130,8 +132,7 @@ public class ProcessTemplate {
         this.envVariables.put(key, value);
         return this;
     }
-
-
+    
     /**
      * Starts a new process from this process-template with a default std-out text reader.
      * @return Returns an async-process
@@ -142,8 +143,30 @@ public class ProcessTemplate {
     }
 
     /**
+     * Starts a new process from this process-template with a custom std-out input-stream consumer
+     * Useful if the process is not emitting text but other binary data.
+     *
+     * @param stdOutReader
+     * @return The async running  process
+     * @throws IOException Thrown when there was a problem starting the process.
+     */
+    public AsyncProcess<Void> start(Consumer<InputStream> stdOutReader) throws IOException {
+        return start(new StreamReader<>() {
+            @Override
+            public void read(InputStream stream) {
+                stdOutReader.accept(stream);
+            }
+
+            @Override
+            public Void getValue() {
+                return null;
+            }
+        });
+    }
+
+    /**
      * Starts a new process from this process-template with a custom std-out reader.
-     * Usefully if the process is not emitting text but other binary data.
+     * Useful if the process is not emitting text but other binary data.
      *
      * @param stdOutReader The std-out reader to use.
      * @param <T> The converted data type from std-out

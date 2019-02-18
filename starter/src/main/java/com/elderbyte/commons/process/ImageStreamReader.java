@@ -7,7 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 
-public class ImageStreamReader extends BufferedStreamReader<BufferedImage>
+public class ImageStreamReader extends ByteStreamReader<BufferedImage>
 {
     @Override
     public BufferedImage getValue() {
