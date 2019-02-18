@@ -132,7 +132,7 @@ public class ProcessTemplate {
         this.envVariables.put(key, value);
         return this;
     }
-    
+
     /**
      * Starts a new process from this process-template with a default std-out text reader.
      * @return Returns an async-process
