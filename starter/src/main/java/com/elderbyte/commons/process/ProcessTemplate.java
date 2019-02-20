@@ -39,12 +39,14 @@ public class ProcessTemplate {
 
     private static final ExecutorService DEFAULT_PROCESS_IO_THREAD_POOL = Executors.newCachedThreadPool();
 
-
-    private final List<String> arguments = new ArrayList<>();
-    private ExecutorService processIOThreadPool = DEFAULT_PROCESS_IO_THREAD_POOL;
-
     private final Map<String, String> envVariables = new HashMap<>();
+    private final List<String> arguments = new ArrayList<>();
+
+    private ExecutorService processIOThreadPool = DEFAULT_PROCESS_IO_THREAD_POOL;
     private Path directory;
+    private boolean redirectErrorToStdOut = false;
+
+
 
     /***************************************************************************
      *                                                                         *
@@ -134,6 +136,14 @@ public class ProcessTemplate {
     }
 
     /**
+     * Redirect the error out to std out.
+     */
+    public ProcessTemplate redirectErrorToStdOut(){
+        redirectErrorToStdOut = true;
+        return this;
+    }
+
+    /**
      * Starts a new process from this process-template with a default std-out text reader.
      * @return Returns an async-process
      * @throws IOException Thrown when there was a problem starting the process.
@@ -177,8 +187,11 @@ public class ProcessTemplate {
         if(stdOutReader == null) throw new ArgumentNullException("stdOutReader");
 
         var processBuilder = new ProcessBuilder(buildCommand());
+        // processBuilder.redirectErrorStream()
 
         if(directory != null) { processBuilder.directory(directory.toFile()); }
+
+        processBuilder.redirectErrorStream(redirectErrorToStdOut);
 
         processBuilder.environment().putAll(envVariables);
         return AsyncProcess.start(processBuilder, stdOutReader, processIOThreadPool);
