@@ -12,7 +12,9 @@ public class TextStreamReader implements StreamReader<String> {
 
     @Override
     public void read(InputStream stream) {
-        sr.read(stream);
+        if(stream != null){
+            sr.read(stream);
+        }
     }
 
     @Override
