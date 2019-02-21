@@ -6,7 +6,6 @@ import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -18,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
-@Order(Ordered.LOWEST_PRECEDENCE) // Ensure our generic Exception handler gets lowest PRECEDENCE
+@Order(-2) // Ensure our generic Exception handler is not overridden by spring default ones.
 @ControllerAdvice
 public class ReactiveGenericExceptionHandler implements ErrorWebExceptionHandler {
 
@@ -44,6 +43,12 @@ public class ReactiveGenericExceptionHandler implements ErrorWebExceptionHandler
             httpStatus = HttpStatus.GATEWAY_TIMEOUT;
         }else if(ex instanceof FeignException){
             httpStatus = HttpStatus.BAD_GATEWAY;
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.error(message, ex);
+        }else{
+            logger.error(message);
         }
 
         return sendResponse(response, httpStatus, message);
