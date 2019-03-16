@@ -1,4 +1,4 @@
 /**
- * Root package of the spring cloud starter bootstrap library.
+ * Root package of the spring boot bootstrap library.
  */
 package com.elderbyte.spring.boot.bootstrap;
