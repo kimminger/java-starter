@@ -79,7 +79,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             groupId 'com.elderbyte.starter'
-            artifactId 'starter-spring'
+            artifactId 'starter-spring-webflux'
 
             artifact sourcesJar
             artifact javadocJar
