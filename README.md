@@ -8,6 +8,10 @@ A java common library to streamline basic java code.
 * Common Exceptions
 * `ContinuationListing<T>`, `ContinuationToken` Support
 
+## starter-spring  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring/_latestVersion)
+
+## starter-spring-webflux  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-webflux/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-webflux/_latestVersion)
+
 ## starter-spring-cloud  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-cloud/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-cloud/_latestVersion)
 
 Provides Spring Cloud Auto Configuration for encoders of common data types and improved exception handlers.
