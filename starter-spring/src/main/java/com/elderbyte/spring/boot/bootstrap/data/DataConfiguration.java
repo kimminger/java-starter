@@ -3,6 +3,7 @@ package com.elderbyte.spring.boot.bootstrap.data;
 import com.elderbyte.commons.data.contiunation.JsonContinuationToken;
 import com.elderbyte.commons.data.contiunation.JsonContinuationTokenBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
