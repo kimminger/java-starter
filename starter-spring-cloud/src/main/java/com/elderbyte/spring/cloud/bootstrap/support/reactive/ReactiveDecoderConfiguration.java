@@ -1,0 +1,22 @@
+package com.elderbyte.spring.cloud.bootstrap.support.reactive;
+
+import com.elderbyte.spring.boot.bootstrap.conditions.ReactiveWebApplicationCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+@Configuration
+@Conditional(ReactiveWebApplicationCondition.class)
+@Import({
+        DefaultWebfluxConfigurer.class
+})
+public class ReactiveDecoderConfiguration {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    public ReactiveDecoderConfiguration(){
+    }
+
+}

@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
 
-    compile project(":starter-spring")
+    compile project(":starter-spring-webflux")
 
     // Spring
     compile("org.springframework.data:spring-data-commons")

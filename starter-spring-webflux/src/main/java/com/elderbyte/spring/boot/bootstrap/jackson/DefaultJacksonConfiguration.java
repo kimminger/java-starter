@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.jackson;
+package com.elderbyte.spring.boot.bootstrap.jackson;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;

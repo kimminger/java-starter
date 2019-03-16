@@ -1,8 +1,8 @@
-package com.elderbyte.spring.cloud.bootstrap.support.reactive;
+package com.elderbyte.spring.boot.bootstrap.reactive;
 
 import com.elderbyte.commons.exceptions.ExceptionUtil;
 import com.elderbyte.commons.exceptions.NotFoundException;
-import feign.FeignException;
+import com.elderbyte.web.client.HttpResponseError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
@@ -41,7 +41,7 @@ public class ReactiveGenericExceptionHandler implements ErrorWebExceptionHandler
             httpStatus = HttpStatus.NOT_FOUND;
         }else if(ex instanceof SocketTimeoutException){
             httpStatus = HttpStatus.GATEWAY_TIMEOUT;
-        }else if(ex instanceof FeignException){
+        }else if(ex instanceof HttpResponseError){
             httpStatus = HttpStatus.BAD_GATEWAY;
         }
 

@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.support.reactive;
+package com.elderbyte.spring.boot.bootstrap.reactive;
 
 import com.elderbyte.spring.boot.bootstrap.conditions.ReactiveWebApplicationCondition;
 import org.slf4j.Logger;
@@ -10,8 +10,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Conditional(ReactiveWebApplicationCondition.class)
 @Import({
-        ReactiveGenericExceptionHandler.class,
-        DefaultWebfluxConfigurer.class
+        ReactiveGenericExceptionHandler.class
 })
 public class ReactiveWebSupportConfiguration {
 
