@@ -13,10 +13,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 public class RestEndpoint<TBody, TId, TCreate>
         implements CRUDResource<TBody, TId, TCreate> {
@@ -27,7 +29,7 @@ public class RestEndpoint<TBody, TId, TCreate>
      *                                                                         *
      **************************************************************************/
 
-    // private final WebClient client;
+    private final String idsQueryParam;
     private final WebClientApi client;
     private final EndpointClient endpoint;
     private final Class<TBody> resourceType;
@@ -38,19 +40,30 @@ public class RestEndpoint<TBody, TId, TCreate>
      *                                                                         *
      **************************************************************************/
 
+
     /**
      * Creates a new RestEndpoint
-     *
-     * @param client
      */
     public RestEndpoint(
             WebClientApi client,
             String endpoint,
-            Class<TBody> resourceType
+            Class<TBody> resourceType){
+        this(client, endpoint, resourceType, "ids");
+    }
+
+    /**
+     * Creates a new RestEndpoint
+     */
+    public RestEndpoint(
+            WebClientApi client,
+            String endpoint,
+            Class<TBody> resourceType,
+            String idsQueryParam
     ) {
         this.client = client;
         this.endpoint = new EndpointClientImpl(client, endpoint);
         this.resourceType = resourceType;
+        this.idsQueryParam = idsQueryParam;
     }
 
     /***************************************************************************
@@ -142,7 +155,7 @@ public class RestEndpoint<TBody, TId, TCreate>
     protected Mono<Void> deleteAll(Collection<TId> ids){
         return deleteAll(
                 RequestOptions.start()
-                        .paramsConvert("ids", ids)
+                        .paramsConvert(idsQueryParam, ids)
         );
     }
 
@@ -190,13 +203,25 @@ public class RestEndpoint<TBody, TId, TCreate>
      *                                                                         *
      **************************************************************************/
 
+    protected Mono<List<TBody>> listAll(String subPath, RequestOptions filter, Sort sort){
+        return listAll(b -> b.pathSegment(subPath), filter, sort);
+    }
+
     /**
      * Get all items of this endpoint.
      * Expect an array/list response
      */
     protected Mono<List<TBody>> listAll(RequestOptions filter, Sort sort){
+        return listAll(b -> b, filter, sort);
+    }
+
+    /**
+     * Get all items of this endpoint.
+     * Expect an array/list response
+     */
+    protected Mono<List<TBody>> listAll(Function<UriBuilder, UriBuilder> uriBuilder, RequestOptions filter, Sort sort){
         return endpoint().get(
-                b -> UriBuilderSupport.apply(b, sort),
+                b -> uriBuilder.apply(UriBuilderSupport.apply(b, sort)),
                 new ParameterizedTypeReference<List<TBody>>() {}, // Dont remove Type Arguments!
                 filter
         );
