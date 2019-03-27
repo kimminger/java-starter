@@ -73,43 +73,58 @@ public class RequestOptionsImpl implements RequestOptions {
      **************************************************************************/
 
     public RequestOptions headers(Function<HttpHeaders, HttpHeaders> headers){
-        headers.apply(this.headers);
+        if(headers != null){
+            headers.apply(this.headers);
+        }
         return this;
     }
 
     public RequestOptions param(String key, String value){
-        queryParams.set(key, value);
+        if(value != null){
+            queryParams.set(key, value);
+        }
         return this;
     }
 
     public RequestOptions params(String key, Collection<String> values){
-        values.stream()
-                .filter(Objects::nonNull)
-                .forEach(v -> appendParam(key, v));
+        if(values != null){
+            values.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(v -> appendParam(key, v));
+        }
         return this;
     }
 
     public RequestOptions paramsConvert(String key, Collection<?> values){
-        values.stream()
-                .filter(Objects::nonNull)
-                .forEach(v -> appendParam(key, v.toString()));
+        if(values != null){
+            values.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(v -> appendParam(key, v.toString()));
+        }
         return this;
     }
 
     public RequestOptions appendParam(String key, String value){
-        queryParams.add(key, value);
+        if(value != null){
+            queryParams.add(key, value);
+        }
         return this;
     }
 
     public RequestOptions merge(MultiValueMap<String, String> params){
-        queryParams.addAll(params);
+        if(params != null){
+            queryParams.addAll(params);
+        }
         return this;
     }
 
 
     @Override
     public RequestOptions withBean(Object bean) {
-        return merge(QueryMapUtil.toQueryMap(bean));
+        if(bean != null){
+            merge(QueryMapUtil.toQueryMap(bean));
+        }
+        return this;
     }
 
     public Optional<String> getParam(String key){

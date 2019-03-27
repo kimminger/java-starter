@@ -74,6 +74,13 @@ public interface WebClientApi {
         return delete(b -> b, responseBodyType, options);
     }
 
+    default <T> Mono<T> delete(
+            ParameterizedTypeReference<T> responseBodyType,
+            RequestOptions options
+    ){
+        return delete(b -> b, responseBodyType, options);
+    }
+
     <T> Mono<T> get(
             Function<UriBuilder, UriBuilder> uriBuilder,
             Class<T> responseBodyType

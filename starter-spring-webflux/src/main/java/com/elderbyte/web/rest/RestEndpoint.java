@@ -95,8 +95,13 @@ public class RestEndpoint<TBody, TId, TCreate>
      *                                                                         *
      **************************************************************************/
 
+
     protected Mono<Void> delete(TId id, RequestOptions options){
-        return endpoint().delete(uri -> uri.pathSegment(toPath(id)), Void.class, options);
+        return delete(id, options, Void.class);
+    }
+
+    protected <T> Mono<T> delete(TId id, RequestOptions options, Class<T> clazz){
+        return endpoint().delete(uri -> uri.pathSegment(toPath(id)), clazz, options);
     }
 
     protected Mono<TBody> getById(TId id, RequestOptions options){
@@ -142,7 +147,15 @@ public class RestEndpoint<TBody, TId, TCreate>
     }
 
     protected Mono<Void> deleteAll(RequestOptions options){
-        return endpoint().delete(Void.class, options);
+        return deleteAll(options, Void.class);
+    }
+
+    protected <T> Mono<T> deleteAll(RequestOptions options, Class<T> clazz){
+        return endpoint().delete(clazz, options);
+    }
+
+    protected <T> Mono<T> deleteAll(RequestOptions options, ParameterizedTypeReference<T> clazz){
+        return endpoint().delete(clazz, options);
     }
 
     protected Mono<List<TBody>> createAll(String pathPart, Collection<TCreate> newEntities) {
@@ -158,6 +171,18 @@ public class RestEndpoint<TBody, TId, TCreate>
         );
     }
 
+    protected Mono<List<TBody>> updateAll(Collection<TBody> updatedEntities, RequestOptions options) {
+        return updateAll(null, updatedEntities, options);
+    }
+
+    protected Mono<List<TBody>> updateAll(String pathPart, Collection<TBody> updatedEntities, RequestOptions options) {
+        return endpoint().put(
+                uri -> pathPart != null ? uri.pathSegment(pathPart) : uri,
+                BodyInserters.fromObject(updatedEntities),
+                new ParameterizedTypeReference<List<TBody>>() {},
+                options
+        );
+    }
 
     /***************************************************************************
      *                                                                         *
