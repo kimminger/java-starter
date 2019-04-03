@@ -1,8 +1,7 @@
 package com.elderbyte.spring.boot.bootstrap.reactive;
 
-import com.elderbyte.commons.exceptions.ExceptionUtil;
+import com.elderbyte.commons.errors.WebErrorDetail;
 import com.elderbyte.commons.exceptions.NotFoundException;
-import com.elderbyte.spring.boot.bootstrap.errors.ExceptionDetailDto;
 import com.elderbyte.web.client.HttpResponseError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -51,12 +50,18 @@ public class ReactiveGenericExceptionHandler implements ErrorWebExceptionHandler
 
     private Mono<Void> sendErrorDetail(ServerWebExchange exchange, Throwable exception, HttpStatus status){
         var request = exchange.getRequest().getMethod() + " " + exchange.getRequest().getPath();
-        var error = ExceptionDetailDto.build(status.toString(), exception, request);
+
+        var error = WebErrorDetail.build(
+                status.value(),
+                status.getReasonPhrase(),
+                exception,
+                request
+        );
 
         if(logger.isDebugEnabled()){
-            logger.error(error.message, exception);
+            logger.error(error.toString(), exception);
         }else{
-            logger.error(error.message);
+            logger.error(error.toString());
         }
 
         return writeAsJson(exchange, error, status);

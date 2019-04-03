@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 /**
  * Provides an easy but extensible api for the WebClient.
- * Additionally, configures mappings and improved exception wrappers.
+ * Additionally, configures mappings and improved type wrappers.
  */
 public class WebClientApiAdapter implements WebClientApi {
 

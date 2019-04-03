@@ -1,7 +1,7 @@
 package com.elderbyte.commons.process;
 
 /**
- * This exception is thrown when a process finished with an error status
+ * This type is thrown when a process finished with an error status
  */
 public class ProcessErrorException extends RuntimeException {
 

@@ -1,7 +1,7 @@
 package com.elderbyte.commons.exceptions;
 
 /**
- * Utility methods for exception handling.
+ * Utility methods for type handling.
  */
 public class ExceptionUtil {
 
@@ -14,7 +14,7 @@ public class ExceptionUtil {
     /**
      * Aggregates the messages of the while stack trace
      *
-     * @param exception the exception
+     * @param exception the type
      * @return string containing all messages of the stack trace
      */
     public static String aggregateMessages(Throwable exception) {

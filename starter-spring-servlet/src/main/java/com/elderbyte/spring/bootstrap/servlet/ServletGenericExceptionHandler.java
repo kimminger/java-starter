@@ -1,7 +1,7 @@
 package com.elderbyte.spring.bootstrap.servlet;
 
+import com.elderbyte.commons.errors.WebErrorDetail;
 import com.elderbyte.commons.exceptions.NotFoundException;
-import com.elderbyte.spring.boot.bootstrap.errors.ExceptionDetailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -33,24 +33,24 @@ public class ServletGenericExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
-    public ExceptionDetailDto handleNotFound(
+    public WebErrorDetail handleNotFound(
             HttpServletRequest req,
             Exception exception) {
 
         var error = build(HttpStatus.NOT_FOUND, exception, req);
-        logger.warn(error.message);
+        logger.warn(error.toString());
         return error;
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
     @ExceptionHandler(SocketTimeoutException.class)
-    public ExceptionDetailDto timeoutException(
+    public WebErrorDetail timeoutException(
             HttpServletRequest req,
             Exception exception) {
 
         var error = build(HttpStatus.GATEWAY_TIMEOUT, exception, req);
-        logger.error(error.message);
+        logger.error(error.toString());
         return error;
     }
 
@@ -61,20 +61,23 @@ public class ServletGenericExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({Exception.class, RuntimeException.class})
-    public ExceptionDetailDto handleUnhandled(
+    public WebErrorDetail handleUnhandled(
             HttpServletRequest req,
             Exception exception) throws IOException {
 
         var error = build(HttpStatus.INTERNAL_SERVER_ERROR, exception, req);
-        logger.error(error.message, exception);
+        logger.error(error.toString(), exception);
         return error;
     }
 
-
-
-    private ExceptionDetailDto build(HttpStatus status, Throwable exception, HttpServletRequest req){
+    private WebErrorDetail build(HttpStatus status, Throwable exception, HttpServletRequest req){
         var requestUrl = req.getMethod() + " " + req.getRequestURI();
-        return ExceptionDetailDto.build(status.toString(), exception, requestUrl);
+        return WebErrorDetail.build(
+                status.value(),
+                status.getReasonPhrase(),
+                exception,
+                requestUrl
+        );
     }
 
 }

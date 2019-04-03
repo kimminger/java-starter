@@ -167,7 +167,7 @@ public class AsyncProcess<T> {
                     // By convention, a zero exit code means success
                     return this;
                 }else{
-                    // The process completed with an error which we translate into an exception
+                    // The process completed with an error which we translate into an type
                     throw new ProcessErrorException(commandLine, exitCode, getErrorOutputAsText());
                 }
             }
