@@ -1,6 +1,7 @@
-package com.elderbyte.spring.boot.bootstrap.jackson;
+package com.elderbyte.spring.bootstrap.jackson;
 
 import com.elderbyte.spring.boot.bootstrap.conditions.ReactiveWebApplicationCondition;
+import com.elderbyte.spring.boot.bootstrap.conditions.ServletWebApplicationCondition;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -15,7 +16,7 @@ import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
 @Configuration
-@Conditional(ReactiveWebApplicationCondition.class)
+@Conditional(ServletWebApplicationCondition.class)
 public class DefaultJacksonConfiguration {
 
     @Bean

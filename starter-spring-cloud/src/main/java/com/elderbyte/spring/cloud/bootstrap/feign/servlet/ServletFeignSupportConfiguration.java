@@ -1,4 +1,4 @@
-package com.elderbyte.spring.cloud.bootstrap.support.servlet;
+package com.elderbyte.spring.cloud.bootstrap.feign.servlet;
 
 import com.elderbyte.spring.boot.bootstrap.conditions.ServletWebApplicationCondition;
 import org.springframework.context.annotation.Conditional;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Conditional(ServletWebApplicationCondition.class)
 @Import({
-        ServletGenericExceptionHandler.class,
+        ServletFeignExceptionHandler.class,
 })
-public class ServletSupportConfiguration {
+public class ServletFeignSupportConfiguration {
 }

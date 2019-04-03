@@ -1,8 +1,7 @@
-package com.elderbyte.spring.cloud.bootstrap.support.servlet;
+package com.elderbyte.spring.bootstrap.servlet;
 
 import com.elderbyte.commons.exceptions.ExceptionUtil;
 import com.elderbyte.commons.exceptions.NotFoundException;
-import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -58,19 +57,6 @@ public class ServletGenericExceptionHandler {
         reponse.sendError(HttpStatus.GATEWAY_TIMEOUT.value(), HttpStatus.GATEWAY_TIMEOUT.value() + " - " + message);
     }
 
-
-    @ExceptionHandler(value = {FeignException.class})
-    public void gatewayException(
-            HttpServletRequest req,
-            HttpServletResponse reponse,
-            Exception exception) throws IOException {
-
-        var message = exception.getClass().getSimpleName() + ": " + ExceptionUtil.aggregateMessages(exception) + " resource: " +  req.getRequestURL();
-
-        logger.error(message, exception);
-
-        reponse.sendError(HttpStatus.BAD_GATEWAY.value(), HttpStatus.BAD_GATEWAY.value() + " - " + message);
-    }
 
     /**
      * Generic Exception handler translates them to INTERNAL_SERVER_ERROR Http codes

@@ -29,11 +29,6 @@ public class DefaultFeignConfiguration {
     private ObjectFactory<HttpMessageConverters> messageConverters;
 
     @Bean
-    public Module PageJacksonModule(){
-        return new PageJacksonModule();
-    }
-
-    @Bean
     public Encoder feignEncoder() {
         return new ContinuationTokenQueryEncoder(new PageableQueryEncoder(new SpringEncoder(messageConverters)));
     }

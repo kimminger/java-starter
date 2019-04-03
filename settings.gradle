@@ -1,6 +1,7 @@
 
 include 'starter'
 include 'starter-spring'
+include 'starter-spring-servlet'
 include 'starter-spring-webflux'
 include 'starter-spring-cloud'
 include 'starter-spring-jpa'
