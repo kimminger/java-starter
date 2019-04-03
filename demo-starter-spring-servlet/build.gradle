@@ -1,0 +1,56 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+version =  version + '-Sp' + springBootVersionBase
+
+
+tasks.withType(Javadoc) {
+    // Avoid failing builds because of java-doc errors
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding','UTF-8')
+}
+
+compileJava {
+    sourceCompatibility = 11
+    targetCompatibility = 11
+
+    options.encoding = "UTF-8"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
+}
+
+dependencies {
+
+    compile project(":starter-spring-servlet")
+
+    // Spring boot
+    compile("org.springframework.boot:spring-boot-starter-web")
+
+
+    // Test dependencies
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("junit:junit")
+}
