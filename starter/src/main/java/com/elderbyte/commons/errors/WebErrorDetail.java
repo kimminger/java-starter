@@ -17,30 +17,13 @@ public class WebErrorDetail {
             Throwable exception,
             String request
     ){
-        return build(
-                status,
-                error,
-                exception,
-                request,
-                null
-        );
-    }
-
-    public static WebErrorDetail build(
-            int status,
-            String error,
-            Throwable exception,
-            String request,
-            String authentication
-    ){
 
         return new WebErrorDetail(
                 status,
                 error,
                 exception.getClass().getSimpleName(),
                 ExceptionUtil.aggregateMessages(exception),
-                request,
-                authentication
+                request
         );
     }
 
@@ -75,11 +58,6 @@ public class WebErrorDetail {
      */
     private final String request;
 
-    /**
-     * Information about who caused the request if available
-     */
-    private final String authentication;
-
     /***************************************************************************
      *                                                                         *
      * Constructors                                                            *
@@ -91,14 +69,12 @@ public class WebErrorDetail {
             String error,
             String type,
             String message,
-            String request,
-            String authentication) {
+            String request) {
         this.error = error;
         this.status = status;
         this.type = type;
         this.message = message;
         this.request = request;
-        this.authentication = authentication;
     }
 
     /***************************************************************************
@@ -136,9 +112,5 @@ public class WebErrorDetail {
 
     public String getRequest() {
         return request;
-    }
-
-    public String getAuthentication() {
-        return authentication;
     }
 }
