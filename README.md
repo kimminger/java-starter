@@ -10,13 +10,29 @@ A java common library to streamline basic java code.
 
 ## starter-spring  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring/_latestVersion)
 
+* Common Spring Configuration Conditions
+* Pagination and Continuable Support
+* Jackson Module for Common Spring Types
+
+
+## starter-spring-servlet  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-servlet/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-servlet/_latestVersion)
+
+* Common Exception Handlers for Servlet
+* Default Jackson JSON configuration
+
+
 ## starter-spring-webflux  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-webflux/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-webflux/_latestVersion)
+
+* Common Exception Handlers for WebFlux
+* Default Jackson JSON configuration
+
 
 ## starter-spring-cloud  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-cloud/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-cloud/_latestVersion)
 
 Provides Spring Cloud Auto Configuration for encoders of common data types and improved exception handlers.
 * Out of the box support for Pageable, Page<T>, ContinuationListing<T> in RestControllers and Feign Clients.
 * Support Optional mapper on Feign client.
+
 
 ## starter-spring-jpa  [![Download](https://api.bintray.com/packages/elderbyte/maven/starter-spring-jpa/images/download.svg) ](https://bintray.com/elderbyte/maven/starter-spring-jpa/_latestVersion)
 
