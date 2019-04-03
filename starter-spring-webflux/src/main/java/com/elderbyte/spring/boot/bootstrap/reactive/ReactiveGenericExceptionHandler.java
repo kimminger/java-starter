@@ -2,18 +2,22 @@ package com.elderbyte.spring.boot.bootstrap.reactive;
 
 import com.elderbyte.commons.exceptions.ExceptionUtil;
 import com.elderbyte.commons.exceptions.NotFoundException;
+import com.elderbyte.spring.boot.bootstrap.errors.ExceptionDetailDto;
 import com.elderbyte.web.client.HttpResponseError;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
@@ -22,19 +26,16 @@ import java.nio.charset.StandardCharsets;
 public class ReactiveGenericExceptionHandler implements ErrorWebExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final ObjectMapper mapper;
 
-    public ReactiveGenericExceptionHandler(){
+    public ReactiveGenericExceptionHandler(ObjectMapper mapper){
         logger.info("Configuring webflux ReactiveGenericExceptionHandler!");
-
+        this.mapper = mapper;
     }
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-        var request = exchange.getRequest();
-        var response = exchange.getResponse();
 
-        String agrMessages = ExceptionUtil.aggregateMessages(ex);
-        String message = ex.getClass().getSimpleName() + ": " + agrMessages + " resource: " +  request.getURI();
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
         if(ex instanceof NotFoundException){
@@ -45,24 +46,39 @@ public class ReactiveGenericExceptionHandler implements ErrorWebExceptionHandler
             httpStatus = HttpStatus.BAD_GATEWAY;
         }
 
+        return sendErrorDetail(exchange, ex, httpStatus);
+    }
+
+    private Mono<Void> sendErrorDetail(ServerWebExchange exchange, Throwable exception, HttpStatus status){
+        var request = exchange.getRequest().getMethod() + " " + exchange.getRequest().getPath();
+        var error = ExceptionDetailDto.build(status.toString(), exception, request);
+
         if(logger.isDebugEnabled()){
-            logger.error(message, ex);
+            logger.error(error.message, exception);
         }else{
-            logger.error(message);
+            logger.error(error.message);
         }
 
-        return sendResponse(response, httpStatus, message);
+        return writeAsJson(exchange, error, status);
     }
 
-    private Mono<Void> sendResponse(ServerHttpResponse response, HttpStatus httpStatus, String errorMessage){
-
-        response.setStatusCode(httpStatus);
-
-        byte[] bytes = errorMessage.getBytes(StandardCharsets.UTF_8);
-        var buffer = response.bufferFactory().wrap(bytes);
-        return response.writeWith(Flux.just(buffer));
+    private Mono<Void> writeAsJson(ServerWebExchange exchange,  Object entity, HttpStatus status) {
+        try {
+            var json = mapper.writeValueAsString(entity);
+            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            return writeBody(exchange, json, status);
+        }catch (IOException e){
+            return Mono.error(e);
+        }
     }
 
+    private static Mono<Void> writeBody(ServerWebExchange exchange, String text, HttpStatus status)  {
+        byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+        exchange.getResponse().setStatusCode(status);
+        exchange.getResponse().getHeaders().setContentLength(bytes.length);
+        return exchange.getResponse().writeWith(Flux.just(buffer));
+    }
 
 }
 

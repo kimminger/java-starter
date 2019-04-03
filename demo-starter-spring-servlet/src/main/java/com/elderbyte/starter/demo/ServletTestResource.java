@@ -17,7 +17,10 @@ public class ServletTestResource {
 
     @GetMapping("/fail")
     public String getAlwaysAuthFail(){
-        throw new IllegalArgumentException("This resource will always fail authentication.");
+        throw new IllegalArgumentException(
+                "This resource will always fail!",
+                new IllegalStateException("I am a nested err.")
+        );
     }
 
 }
