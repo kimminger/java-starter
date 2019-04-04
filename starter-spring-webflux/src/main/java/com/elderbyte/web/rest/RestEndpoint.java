@@ -2,10 +2,11 @@ package com.elderbyte.web.rest;
 
 import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
+import com.elderbyte.spring.boot.bootstrap.types.TypeRef;
 import com.elderbyte.web.UriBuilderSupport;
 import com.elderbyte.web.client.EndpointClientImpl;
-import com.elderbyte.web.client.WebClientApi;
 import com.elderbyte.web.client.RequestOptions;
+import com.elderbyte.web.client.WebClientApi;
 import com.elderbyte.web.rest.api.CRUDResource;
 import com.elderbyte.web.rest.api.EndpointClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -179,7 +180,7 @@ public class RestEndpoint<TBody, TId, TCreate>
         return endpoint().post(
                 pathPart,
                 BodyInserters.fromObject(newEntities),
-                new ParameterizedTypeReference<List<TBody>>() {},
+                TypeRef.from(List.class, resourceType),
                 options
         );
     }
@@ -192,7 +193,7 @@ public class RestEndpoint<TBody, TId, TCreate>
         return endpoint().put(
                 uri -> pathPart != null ? uri.pathSegment(pathPart) : uri,
                 BodyInserters.fromObject(updatedEntities),
-                new ParameterizedTypeReference<List<TBody>>() {},
+                TypeRef.from(List.class, resourceType),
                 options
         );
     }
@@ -220,9 +221,10 @@ public class RestEndpoint<TBody, TId, TCreate>
      * Expect an array/list response
      */
     protected Mono<List<TBody>> listAll(Function<UriBuilder, UriBuilder> uriBuilder, RequestOptions filter, Sort sort){
+
         return endpoint().get(
                 b -> uriBuilder.apply(UriBuilderSupport.apply(b, sort)),
-                new ParameterizedTypeReference<List<TBody>>() {}, // Dont remove Type Arguments!
+                TypeRef.from(List.class, resourceType),
                 filter
         );
     }
@@ -237,7 +239,7 @@ public class RestEndpoint<TBody, TId, TCreate>
 
         return endpoint().get(
                 b -> UriBuilderSupport.apply(b, pageable),
-                new ParameterizedTypeReference<Page<TBody>>() {}, // Dont remove Type Arguments!
+                TypeRef.from(Page.class, resourceType),
                 options
         );
     }
@@ -253,10 +255,11 @@ public class RestEndpoint<TBody, TId, TCreate>
 
         return endpoint().get(
                 b -> UriBuilderSupport.apply(b, sort, token),
-                new ParameterizedTypeReference<ContinuableListing<TBody>>() {}, // Dont remove Type Arguments!
+                TypeRef.from(ContinuableListing.class, resourceType),
                 options
         );
     }
+
 
     /***************************************************************************
      *                                                                         *
@@ -313,4 +316,7 @@ public class RestEndpoint<TBody, TId, TCreate>
     private String toPath(TId id){
         return id.toString();
     }
+
+
+
 }
