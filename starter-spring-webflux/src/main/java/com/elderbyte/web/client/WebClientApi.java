@@ -93,6 +93,19 @@ public interface WebClientApi {
     );
 
     default <T> Mono<T> get(
+            Class<T> responseBodyType
+    ){
+        return get(b -> b, responseBodyType);
+    }
+
+    default <T> Mono<T> get(
+            Class<T> responseBodyType,
+            RequestOptions options
+    ){
+        return get(b -> b, responseBodyType, options);
+    }
+
+    default <T> Mono<T> get(
             String pathPart,
             Class<T> responseType
     ){
@@ -120,12 +133,29 @@ public interface WebClientApi {
         return post(b -> b.pathSegment(pathPart), requestBody, responseBodyType, options);
     }
 
+    default <T> Mono<T> post(
+            BodyInserter<?, ? super ClientHttpRequest> requestBody,
+            Class<T> responseBodyType,
+            RequestOptions options
+    ){
+        return post(b -> b, requestBody, responseBodyType, options);
+    }
+
     <T> Mono<T> post(
             Function<UriBuilder, UriBuilder> uriBuilder,
             BodyInserter<?, ? super ClientHttpRequest> requestBody,
             Class<T> responseBodyType,
             RequestOptions options
     );
+
+
+    default <T> Mono<T> put(
+            BodyInserter<?, ? super ClientHttpRequest> requestBody,
+            Class<T> responseBodyType,
+            RequestOptions options
+    ){
+        return put(b -> b, requestBody, responseBodyType, options);
+    }
 
     <T> Mono<T> put(
             Function<UriBuilder, UriBuilder> uriBuilder,

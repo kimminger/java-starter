@@ -4,11 +4,10 @@ import com.elderbyte.commons.data.contiunation.ContinuableListing;
 import com.elderbyte.commons.data.contiunation.ContinuationToken;
 import com.elderbyte.spring.boot.bootstrap.types.TypeRef;
 import com.elderbyte.web.UriBuilderSupport;
-import com.elderbyte.web.client.EndpointClientImpl;
+import com.elderbyte.web.client.ApiEndpoint;
 import com.elderbyte.web.client.RequestOptions;
 import com.elderbyte.web.client.WebClientApi;
 import com.elderbyte.web.rest.api.CRUDResource;
-import com.elderbyte.web.rest.api.EndpointClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-public class RestEndpoint<TBody, TId, TCreate>
+public class RestEndpoint<TBody, TId, TCreate> extends ApiEndpoint
         implements CRUDResource<TBody, TId, TCreate> {
 
     /***************************************************************************
@@ -31,8 +30,7 @@ public class RestEndpoint<TBody, TId, TCreate>
      **************************************************************************/
 
     private final String idsQueryParam;
-    private final WebClientApi client;
-    private final EndpointClient endpoint;
+
     private final Class<TBody> resourceType;
 
     /***************************************************************************
@@ -40,7 +38,6 @@ public class RestEndpoint<TBody, TId, TCreate>
      * Constructor                                                             *
      *                                                                         *
      **************************************************************************/
-
 
     /**
      * Creates a new RestEndpoint
@@ -61,24 +58,9 @@ public class RestEndpoint<TBody, TId, TCreate>
             Class<TBody> resourceType,
             String idsQueryParam
     ) {
-        this.client = client;
-        this.endpoint = new EndpointClientImpl(client, endpoint);
+        super(client, endpoint);
         this.resourceType = resourceType;
         this.idsQueryParam = idsQueryParam;
-    }
-
-    /***************************************************************************
-     *                                                                         *
-     * Properties                                                              *
-     *                                                                         *
-     **************************************************************************/
-
-    public EndpointClient endpoint(){
-        return endpoint;
-    }
-
-    public WebClientApi client(){
-        return client;
     }
 
     /***************************************************************************
@@ -124,7 +106,6 @@ public class RestEndpoint<TBody, TId, TCreate>
 
     protected Mono<TBody> create(TCreate newEntity, RequestOptions options) {
         return endpoint().post(
-                uri -> uri,
                 BodyInserters.fromObject(newEntity),
                 resourceType,
                 options
