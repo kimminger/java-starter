@@ -23,7 +23,7 @@ public class HttpResponseError extends RuntimeException {
      **************************************************************************/
 
     public HttpResponseError(HttpRequest request, HttpStatus status, String statusText, String responseBody) {
-        super(status + " - " + statusText + ": " + responseBody);
+        super(status + " - " + statusText + " @ " + request.getMethod() + " " + request.getURI()  + " --> Body: " + responseBody);
         this.request = request;
         this.status = status;
         this.statusText = statusText;
