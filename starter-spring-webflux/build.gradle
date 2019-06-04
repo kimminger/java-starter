@@ -46,6 +46,7 @@ dependencies {
 
     // Test dependencies
     testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.springframework.boot:spring-boot-starter-webflux")
     testCompile("junit:junit")
 }
 
