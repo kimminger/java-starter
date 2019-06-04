@@ -39,9 +39,12 @@ public class UriBuilderSupport {
 
         if(sort == null) return uriBuilder;
 
-        return sort.isSorted()
-                ? uriBuilder.queryParam("sort", sort.toString())
-                : uriBuilder;
+        if(sort.isSorted()){
+            sort.forEach(order -> {
+                uriBuilder.queryParam("sort", order.getProperty() + "," + order.getDirection().toString().toLowerCase());
+            });
+        }
+        return uriBuilder;
     }
 
 }
