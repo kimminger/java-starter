@@ -30,6 +30,15 @@ public class UriBuilderSupportTest {
     }
 
     @Test
+    public void apply_sort_multiple() {
+        var sort = Sort.by(Sort.Order.asc("my.test"), Sort.Order.desc("low"));
+        var builder = UriComponentsBuilder.fromUriString("http://elderbyte.com/test");
+        var applied = UriBuilderSupport.apply(builder, sort);
+        var uri  = applied.build().toString();
+        assertEquals("http://elderbyte.com/test?sort=my.test,asc&sort=low,desc", uri);
+    }
+
+    @Test
     public void apply_token() {
         var token = ContinuationToken.from("my-token");
         var builder = UriComponentsBuilder.fromUriString("http://elderbyte.com/test");
