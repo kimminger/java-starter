@@ -49,6 +49,7 @@ dependencies {
     compile("org.springframework.data:spring-data-commons")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
+    compile("com.fasterxml.jackson.core:jackson-core")
     compile("com.fasterxml.jackson.core:jackson-databind")
 
     // Test dependencies

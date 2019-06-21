@@ -1,1 +1,4 @@
 
+
+# Auto configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.elderbyte.spring.data.mongo.MongoBootstrapAutoConfiguration
