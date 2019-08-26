@@ -44,8 +44,11 @@ dependencies {
     // Spring Boot
     compile("org.springframework.boot:spring-boot-starter")
 
+    // Spring Actuator
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+
     // Metrics
-    compile("io.micrometer:micrometer-core")
+    compile "io.micrometer:micrometer-registry-prometheus:${micrometerRegistryPrometheusVersion}"
 
     // JSON
     compile("com.fasterxml.jackson.core:jackson-core")
