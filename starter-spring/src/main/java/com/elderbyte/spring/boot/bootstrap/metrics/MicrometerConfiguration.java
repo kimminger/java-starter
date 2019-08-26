@@ -12,7 +12,7 @@ public class MicrometerConfiguration {
     /**
      * Configure this variable in your Application - Properties File
      */
-    @Value("${application.name}")
+    @Value("${spring.application.name}")
     private String applicationName;
 
     /**
