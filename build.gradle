@@ -26,7 +26,6 @@ subprojects {
         feignOkHttpVersion = '10.2.3'
 
         bintrayVersion = '1.8.4'
-        micrometerRegistryPrometheusVersion= '1.2.0'
     }
 
     tasks.withType(Javadoc) {
